@@ -41,7 +41,7 @@ function processMessage($message) {
 			// stop now
 		} else {
 			
-			apiRequestWebhook ( "sendMessage", array (
+			apiRequestJson( "sendMessage", array (
 					'chat_id' => $chat_id,
 					"reply_to_message_id" => $message_id,
 					"text" => 'Cool' 
