@@ -3,9 +3,8 @@ include_once 'network.php';
 include_once 'bot.php';
 
 //read data from the request
-$content = file_get_content("php://input");
-$update = json_decode($content, true); //decode the json request
-$result=$update["result"]; //get the request containing the update
+$content = file_get_contents("php://input");
+$result = json_decode($content, true); //decode the json request
 
 //if the request is empty just exit
 if (!count($result)) {
