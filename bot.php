@@ -14,8 +14,8 @@ function processMessage($message) {
 		if (strpos ( $text, "/start" ) === 0) {
 			
 			$file=fopen("start.txt", "r");
-			$response=fread("start.txt", filesize("start.txt"));
-			fclose("start.txt");
+			$response=fread($file, filesize("start.txt"));
+			fclose($file);
 			apiRequestJson ( "sendMessage", array (
 					'chat_id' => $chat_id,
 					'text' => $response,
