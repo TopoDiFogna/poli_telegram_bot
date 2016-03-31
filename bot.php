@@ -14,7 +14,7 @@ function processMessage($message) {
 		if (strpos ( $text, "/start" ) === 0) {
 			
 			$response='*ciao*
-					_cacca_';
+_cacca_';
 			
 			apiRequestJson ( "sendMessage", array (
 					'chat_id' => $chat_id,
