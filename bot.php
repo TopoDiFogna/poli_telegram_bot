@@ -13,23 +13,15 @@ function processMessage($message) {
 		
 		if (strpos ( $text, "/start" ) === 0) {
 			
+			$response='*ciao*
+					_cacca_';
+			
 			apiRequestJson ( "sendMessage", array (
 					'chat_id' => $chat_id,
-					"text" => 'Hello',
-					'reply_markup' => array (
-							
-							'keyboard' => array (
-									array (
-											'Hello',
-											'Hi' 
-									) 
-							),
-							
-							'one_time_keyboard' => true,
-							
-							'resize_keyboard' => true 
+					'text' => $response,
+					'parse_mode' => 'Markdown',
 					) 
-			) );
+			);
 		} else if ($text === "Hello" || $text === "Hi") {
 			
 			apiRequestJson ( "sendMessage", array (
