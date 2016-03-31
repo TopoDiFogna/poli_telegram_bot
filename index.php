@@ -2,23 +2,16 @@
 include_once 'network.php';
 include_once 'bot.php';
 
-$offset=0;
-$content = file_get_contents(API_URL. "getUpdates?offset=".$offset);
-$update = json_decode($content, true);
-$result=$update["result"];
+//read data from the request
+$content = file_get_content("php://input");
+$update = json_decode($content, true); //decode the json request
+$result=$update["result"]; //get the request containing the update
+
+//if the request is empty just exit
 if (!count($result)) {
 	exit;
 }
-$firstMessage=$result[0];
-$offset=$firstMessage["update_id"]+1;
-$content = file_get_contents(API_URL. "getUpdates?offset=".$offset);
-
-if (!$firstMessage) {
-	echo("error");
-	exit;
-}
-
-if (isset($firstMessage["message"])) {
-	processMessage($firstMessage["message"]);
+else {//therwise process the message
+	processMessage($result["message"]);
 }
 ?>

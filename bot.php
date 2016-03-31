@@ -1,15 +1,15 @@
 <?php
 function processMessage($message) {
 	// process incoming message
-	$message_id = $message ['message_id'];
+	$message_id = $message ['message_id'];//used in replies
 	
-	$chat_id = $message ['chat'] ['id'];
+	$chat_id = $message ['chat'] ['id'];//chat to send the message to
 	
-	if (isset ( $message ['text'] )) {
+	$text_message = $message['text'];//what has been sent to the bot
+	
+	if (isset ( $text_message )) {
 		
-		// incoming text message
-		
-		$text = $message ['text'];
+		$text = $message ['text']; //incoming text message
 		
 		if (strpos ( $text, "/start" ) === 0) {
 			
