@@ -70,7 +70,7 @@ function startFunction($chat_id, $message_id) {
 	) );
 }
 function occupationOfTheDay($chat_id, $message_id) {
-	$url='https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=tutte&tipologia=tutte&giorno_day=4&giorno_month=4&giorno_year=2016&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
+	$url='https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=4&giorno_month=4&giorno_year=2016&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
 	$options = array(
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER => false,
