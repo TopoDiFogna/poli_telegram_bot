@@ -56,6 +56,7 @@ function sendMessage($chat_id, $text, $params) {
 	}
 	$params ["method"] = "sendMessage";
 	$params ["text"] = $text;
+	$params ["chat_id"] = $chat_id;
 	$handle = curl_init ();
 	curl_setopt ( $handle, CURLOPT_URL, API_URL );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
