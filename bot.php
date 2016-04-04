@@ -71,7 +71,7 @@ function startFunction($chat_id, $message_id) {
 			'text' => $response,
 			'parse_mode' => 'Markdown' 
 	) ); */
-}/*
+}
 function occupationOfTheDay($chat_id, $message_id) {
 	$url='https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=4&giorno_month=4&giorno_year=2016&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
 	$options = array(
@@ -91,6 +91,7 @@ function occupationOfTheDay($chat_id, $message_id) {
 	curl_close($ch);
 	
 	$dom=new DOMDocument();
+	$internalErrors = libxml_use_internal_errors(true);
 	$dom->loadHTML($content);
 	$my=$dom->getElementById('tableContainer');
 	$newdom=new DOMDocument();
@@ -106,11 +107,12 @@ function occupationOfTheDay($chat_id, $message_id) {
 	fclose($myfile);
 	$cmdLine='xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
 	shell_exec($cmdLine);
+	libxml_use_internal_errors($internalErrors);
 	$fileNamePath=realpath('occupation.html');
 	apiRequestJsonFile( "sendDocument", array (
 			'chat_id' => $chat_id,
-			'document' => '@'.$fileNamePath,
+			'document' => new CURLFile($fileNamePath),
 	) );
 	
-}*/
+}
 ?>
