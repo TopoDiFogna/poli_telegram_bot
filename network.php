@@ -55,6 +55,7 @@ function sendMessage($chat_id, $text, $params) {
 		error_log ( "params is not an array!" );
 	}
 	$params ["method"] = "sendMessage";
+	$params ["text"] = $text;
 	$handle = curl_init ();
 	curl_setopt ( $handle, CURLOPT_URL, API_URL );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
