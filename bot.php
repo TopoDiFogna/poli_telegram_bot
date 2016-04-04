@@ -29,10 +29,8 @@ function processMessage($message) {
 	}
 }
 
-function processTextMessage($text_message){
-	if (isset ( $text_message )) {
-	
-		$text = $message ['text']; //incoming text message
+function processTextMessage($text){
+	if (isset ( $text)) {
 	
 		if (strpos ( $text, "/start" ) === 0) {
 				
