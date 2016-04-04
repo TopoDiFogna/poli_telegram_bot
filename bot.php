@@ -8,7 +8,7 @@ function processMessage($message) {
 	switch ($message){ 
 		case array_key_exists('text', $message): 
 			$text_message = $message['text'];
-			processTextMessage($text_message);
+			processTextMessage($text_message,$chat_id,$message_id);
 			break;
 		case array_key_exists('audio', $message):
 			break;
@@ -29,7 +29,7 @@ function processMessage($message) {
 	}
 }
 
-function processTextMessage($text){
+function processTextMessage($text,$chat_id,$message_id){
 	if (isset ( $text)) {
 	
 		if (strpos ( $text, "/start" ) === 0) {
