@@ -4,7 +4,6 @@ define ( 'BOT_TOKEN', '142518261:AAGi48H9GL-oQxw_cQFVmwFnPVT6KBVFty0' );
 
 // url to query the bot
 define ( 'API_URL', 'https://api.telegram.org/bot' . BOT_TOKEN . '/' );
-
 function exec_curl_request($handle) {
 	
 	// response to save response from telegram servers
@@ -31,7 +30,7 @@ function exec_curl_request($handle) {
 		$response = json_decode ( $response, true );
 		error_log ( "Request has failed with error {$response['error_code']}: {$response['description']}\n" );
 		
-		if ($http_code == 401) { // 400=unauthorized access
+		if ($http_code == 401) { // 401=unauthorized access
 			throw new Exception ( 'Invalid access token provided' );
 		}
 		
@@ -49,14 +48,11 @@ function exec_curl_request($handle) {
 	}
 	return $response;
 }
-
-function sendMessage($chat_id, $text, $params){
-	
+function sendMessage($chat_id, $text, $params) {
 	if (! $params) {
-		$params = array();
-	}
-	elseif (! is_array($params)) {
-		error_log("params is not an array!");
+		$params = array ();
+	} elseif (! is_array ( $params )) {
+		error_log ( "params is not an array!" );
 	}
 	$parameters ["method"] = "sendMessage";
 	$handle = curl_init ();
@@ -66,11 +62,10 @@ function sendMessage($chat_id, $text, $params){
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
 	curl_setopt ( $handle, CURLOPT_POSTFIELDS, json_encode ( $params ) );
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
-			"Content-Type: application/json"
+			"Content-Type: application/json" 
 	) );
 	exec_curl_request ( $handle );
 }
-
 function apiRequestJson($method, $parameters) {
 	if (! is_string ( $method )) {
 		echo ("Method name must be a string\n");
@@ -99,31 +94,30 @@ function apiRequestJson($method, $parameters) {
 	) );
 	return exec_curl_request ( $handle );
 }
-
 function apiRequestJsonFile($method, $parameters) {
 	if (! is_string ( $method )) {
 		echo ("Method name must be a string\n");
 		return false;
 	}
-
+	
 	if (! $parameters) {
 		$parameters = array ();
 	} else if (! is_array ( $parameters )) {
 		echo ("Parameters must be an array\n");
 		return false;
 	}
-
+	
 	$parameters ["method"] = $method;
-
+	
 	$handle = curl_init ();
 	curl_setopt ( $handle, CURLOPT_URL, API_URL );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
-	curl_setopt($handle, CURLOPT_POST,true);
+	curl_setopt ( $handle, CURLOPT_POST, true );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
 	curl_setopt ( $handle, CURLOPT_POSTFIELDS, json_encode ( $parameters ) );
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
-			"Content-Type: multipart/form-data"
+			"Content-Type: multipart/form-data" 
 	) );
 	return exec_curl_request ( $handle );
 }
