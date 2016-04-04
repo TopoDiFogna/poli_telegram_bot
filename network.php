@@ -86,9 +86,7 @@ function apiRequestJsonFile($method, $parameters) {
 	if (! $parameters) {
 		$parameters = array ();
 	} else if (! is_array ( $parameters )) {
-
 		echo ("Parameters must be an array\n");
-
 		return false;
 	}
 
@@ -97,6 +95,7 @@ function apiRequestJsonFile($method, $parameters) {
 	$handle = curl_init ();
 	curl_setopt ( $handle, CURLOPT_URL, API_URL );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
+	curl_setopt($handle, CURLOPT_POST,true);
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
 	curl_setopt ( $handle, CURLOPT_POSTFIELDS, json_encode ( $parameters ) );
