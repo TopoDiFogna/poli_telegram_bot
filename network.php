@@ -4,6 +4,7 @@ define ( 'BOT_TOKEN', '142518261:AAGi48H9GL-oQxw_cQFVmwFnPVT6KBVFty0' );
 
 // url to query the bot
 define ( 'API_URL', 'https://api.telegram.org/bot' . BOT_TOKEN . '/' );
+
 function exec_curl_request($handle) {
 	
 	// response to save response from telegram servers
@@ -48,6 +49,28 @@ function exec_curl_request($handle) {
 	}
 	return $response;
 }
+
+function sendMessage($chat_id, $text, $params){
+	
+	if (! $params) {
+		$params = array();
+	}
+	elseif (! is_array($params)) {
+		error_log("params is not an array!");
+	}
+	$parameters ["method"] = "sendMessage";
+	$handle = curl_init ();
+	curl_setopt ( $handle, CURLOPT_URL, API_URL );
+	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
+	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
+	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
+	curl_setopt ( $handle, CURLOPT_POSTFIELDS, json_encode ( $params ) );
+	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
+			"Content-Type: application/json"
+	) );
+	exec_curl_request ( $handle );
+}
+
 function apiRequestJson($method, $parameters) {
 	if (! is_string ( $method )) {
 		echo ("Method name must be a string\n");
