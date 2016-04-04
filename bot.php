@@ -63,6 +63,7 @@ function startFunction($chat_id, $message_id) {
 	$file = fopen ( "start.txt", "r" );
 	$response = fread ( $file, filesize ( "start.txt" ) );
 	fclose ( $file );
+	error_log($response);
 	sendMessage($chat_id, $response, array (
 			'parse_mode' => 'Markdown' 
 	) );
