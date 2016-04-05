@@ -30,12 +30,12 @@ function processMessage($message) {
 }
 function processTextMessage($text, $chat_id, $message_id) {
 	switch ($text) {
-		case strpos ( $text, "/start" ) == 0 :
+		case "/start":
 			startFunction ( $chat_id, $message_id );
 			break;
-		case strpos ( $text, "/stop" ) === 0 :
+		case "/stop":
 			break;
-		case strpos ( $text, "/occupation" ) === 0 :
+		case "/occupation":
 			occupationOfTheDay ( $chat_id );
 			break;
 		default :
