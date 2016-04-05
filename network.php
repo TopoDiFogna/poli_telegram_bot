@@ -96,7 +96,7 @@ function apiRequestJson($method, $parameters) {
 	) );
 	return exec_curl_request ( $handle );
 }
-function apiRequestJsonFile($method, $parameters) {
+function sendNewFile($method, $parameters) {
 	if (! is_string ( $method )) {
 		echo ("Method name must be a string\n");
 		return false;

@@ -30,32 +30,34 @@ function processMessage($message) {
 }
 function processTextMessage($text, $chat_id, $message_id) {
 	if (isset ( $text )) {
-		
-		if (strpos ( $text, "/start" ) === 0) {
-			startFunction ( $chat_id, $message_id );
-		} else if ($text === "Hello" || $text === "Hi") {
-			apiRequestJson ( "sendMessage", array (
-					'chat_id' => $chat_id,
-					"text" => 'Nice to meet you' 
-			) );
-		} else if (strpos ( $text, "/stop" ) === 0) {
-			
-			// stop now
-		} else if (strpos ( $text, "/occupation" ) === 0) {
-			occupationOfTheDay ( $chat_id, $message_id );
-		} else {
-			
-			apiRequestJson ( "sendMessage", array (
-					'chat_id' => $chat_id,
-					"reply_to_message_id" => $message_id,
-					"text" => 'Cool' 
-			) );
+		switch ($text){
+			case (strpos($text, "/start")==0):
+				startFunction($chat_id, $message_id);
+				break;
+			case ($text === "Hello" || $text === "Hi"):
+				apiRequestJson ( "sendMessage", array (
+						'chat_id' => $chat_id,
+						"text" => 'Nice to meet you'
+				) );
+				break;
+			case (strpos ( $text, "/stop" ) === 0):
+				break;
+			case (strpos ( $text, "/occupation" ) === 0):
+				occupationOfTheDay($chat_id);
+				break;
+			default:
+				piRequestJson ( "sendMessage", array (
+						'chat_id' => $chat_id,
+						"reply_to_message_id" => $message_id,
+						"text" => 'Cool'
+				) );
+				break;
 		}
 	} else {
-		
 		apiRequestJson ( "sendMessage", array (
 				'chat_id' => $chat_id,
-				"text" => 'I understand only text messages' 
+				'reply_to_message_id' => $message_id,
+				'text' => 'You Send me an empty text Message, fool !!' 
 		) );
 	}
 }
@@ -72,8 +74,35 @@ function startFunction($chat_id, $message_id) {
 			'parse_mode' => 'Markdown' 
 	) ); */
 }
-function occupationOfTheDay($chat_id, $message_id) {
-	$url='https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=4&giorno_month=4&giorno_year=2016&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
+function occupationOfTheDay($chat_id) {
+	$day=date('j');
+	$month=date('n');
+	$year=date('Y');
+	$time=data('H:i:s',time());
+	$lastDate=getLastDate();
+	$splitted=explode('-', $lastDate);
+	
+	$url='https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day='.$day.'&giorno_month='.$month.'&giorno_year='.$year.'&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
+	$result=getHTMLCurlResponse($url);
+	
+	$domOfHTML=getDOMFromHTMLIDWithCSS($result, 'tableContainer', "spazi/table-MOZ.css");
+	
+	$myfile=fopen("occupation.html","w");
+	fwrite($myfile,$domOfHTML->saveHTML());
+	fclose($myfile);
+	$fileNamePath=realpath('occupation.html');
+	
+	$cmdLine='xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
+	shell_exec($cmdLine);
+	
+	sendNewFile( "sendDocument", array (
+			'chat_id' => $chat_id,
+			'document' => new CURLFile($fileNamePath),
+	) );
+	
+}
+
+function getHTMLCurlResponse($url){
 	$options = array(
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER => false,
@@ -89,30 +118,23 @@ function occupationOfTheDay($chat_id, $message_id) {
 	curl_setopt_array($ch,$options);
 	$content=curl_exec($ch);
 	curl_close($ch);
-	
+	return $content;
+}
+
+function getDOMFromHTMLIDWithCSS($page,$idToSelect,$cssFilePath){
 	$dom=new DOMDocument();
 	$internalErrors = libxml_use_internal_errors(true);
-	$dom->loadHTML($content);
-	$my=$dom->getElementById('tableContainer');
+	$dom->loadHTML($page);
+	$my=$dom->getElementById($idToSelect);
 	$newdom=new DOMDocument();
 	$cloned=$my->cloneNode(TRUE);
-	$styleFile=fopen("spazi/table-MOZ.css","r");
-	$style=fread($styleFile, filesize("spazi/table-MOZ.css"));
+	$styleFile=fopen($cssFilePath,"r");
+	$style=fread($styleFile, filesize($cssFilePath));
 	fclose($styleFile);
 	$element=$newdom->createElement('style',$style);
 	$newdom->appendChild($element);
 	$newdom->appendChild($newdom->importNode($cloned, TRUE));
-	$myfile=fopen("occupation.html","w");
-	fwrite($myfile,$newdom->saveHTML());
-	fclose($myfile);
-	$cmdLine='xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
-	shell_exec($cmdLine);
 	libxml_use_internal_errors($internalErrors);
-	$fileNamePath=realpath('occupation.html');
-	apiRequestJsonFile( "sendDocument", array (
-			'chat_id' => $chat_id,
-			'document' => new CURLFile($fileNamePath),
-	) );
-	
+	return $newdom;
 }
 ?>
