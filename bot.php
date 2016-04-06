@@ -29,14 +29,25 @@ function processMessage($message) {
 	}
 }
 function processTextMessage($text, $chat_id, $message_id) {
-	switch ($text) {
-		case "/start":
+	$command = explode ( " ", $text );
+	switch ($command [0]) {
+		case "/start" :
 			startFunction ( $chat_id, $message_id );
 			break;
-		case "/stop":
+		case "/stop" :
 			break;
-		case "/occupation":
+		case "/occupation" :
 			occupationOfTheDay ( $chat_id );
+			break;
+		case "/classroom" :
+			if (! isset ( $command [1] )) {
+				sendMessage ( $chat_id, "Stronzo mi devi dire un'aula", array (
+						"reply_to_message_id" => $message_id 
+				) );
+			}
+			else{
+				classOccupation ( $chat_id, $command [1] );
+			}
 			break;
 		default :
 			sendMessage ( $chat_id, "Cool", array (
@@ -53,28 +64,30 @@ function startFunction($chat_id, $message_id) {
 			'parse_mode' => 'Markdown' 
 	) );
 }
+function classOccupation($chat_id, $classname) {
+	;
+}
 function occupationOfTheDay($chat_id) {
-	
 	$fileNamePath = realpath ( 'occupation.html' );
 	
-	if (!file_exists($fileNamePath)) {
-		createOccupationFile();
+	if (! file_exists ( $fileNamePath )) {
+		createOccupationFile ();
 	}
 	
-	if (time()-filemtime($fileNamePath)>3600*2) {
-		createOccupationFile();
+	if (time () - filemtime ( $fileNamePath ) > 3600 * 2) {
+		createOccupationFile ();
 	}
 	
-	//$cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
-	//shell_exec ( $cmdLine );
+	// $cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
+	// shell_exec ( $cmdLine );
 	
 	sendNewFile ( "sendDocument", array (
 			'chat_id' => $chat_id,
 			'document' => new CURLFile ( $fileNamePath ) 
 	) );
 }
-
 function createOccupationFile() {
+	error_log ( "created occupation.html" );
 	$day = date ( 'j' );
 	$month = date ( 'n' );
 	$year = date ( 'Y' );
@@ -87,7 +100,6 @@ function createOccupationFile() {
 	fwrite ( $myfile, $domOfHTML->saveHTML () );
 	fclose ( $myfile );
 }
-
 function getHTMLCurlResponse($url) {
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
@@ -98,7 +110,9 @@ function getHTMLCurlResponse($url) {
 			CURLOPT_AUTOREFERER => true,
 			CURLOPT_ENCODING => '',
 			CURLOPT_CONNECTTIMEOUT => 120,
-			CURLOPT_TIMEOUT => 120 
+			CURLOPT_TIMEOUT => 120 ,
+			CURLOPT_COOKIEJAR => dirname(__FILE__) . 'cookie.txt',
+			CURLOPT_COOKIESESSION => true,
 	);
 	$ch = curl_init ( $url );
 	curl_setopt_array ( $ch, $options );
