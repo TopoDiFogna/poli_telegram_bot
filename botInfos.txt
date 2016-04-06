@@ -1,3 +1,0 @@
-﻿Name: poliBot
-Tag: @PoliMilanoBot (tutti quelli con polimi sono già andati)
-Authorization Token: 

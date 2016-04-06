@@ -64,21 +64,6 @@ function occupationOfTheDay($chat_id) {
 	if (time()-filemtime($fileNamePath)>3600*2) {
 		createOccupationFile();
 	}
-	/*if(timeIsWell()){
-		$day = date ( 'j' );
-		$month = date ( 'n' );
-		$year = date ( 'Y' );
-		$url = 'https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=' . $day . '&giorno_month=' . $month . '&giorno_year=' . $year . '&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
-		$result = getHTMLCurlResponse ( $url );
-		
-		$domOfHTML = getDOMFromHTMLIDWithCSS ( $result, 'tableContainer', "spazi/table-MOZ.css" );
-		
-		$myfile = fopen ( "occupation.html", "w" );
-		fwrite ( $myfile, $domOfHTML->saveHTML () );
-		fclose ( $myfile );
-		updateDateAndTime();
-	}*/
-
 	
 	//$cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
 	//shell_exec ( $cmdLine );
