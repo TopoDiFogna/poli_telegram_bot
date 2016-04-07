@@ -44,8 +44,7 @@ function processTextMessage($text, $chat_id, $message_id) {
 				sendMessage ( $chat_id, "Stronzo mi devi dire un'aula", array (
 						"reply_to_message_id" => $message_id 
 				) );
-			}
-			else{
+			} else {
 				classOccupation ( $chat_id, $command [1] );
 			}
 			break;
@@ -63,9 +62,6 @@ function startFunction($chat_id, $message_id) {
 	sendMessage ( $chat_id, $response, array (
 			'parse_mode' => 'Markdown' 
 	) );
-}
-function classOccupation($chat_id, $classname) {
-	;
 }
 function occupationOfTheDay($chat_id) {
 	$fileNamePath = realpath ( 'occupation.html' );
@@ -109,10 +105,10 @@ function getHTMLCurlResponse($url) {
 			CURLOPT_AUTOREFERER => true,
 			CURLOPT_ENCODING => '',
 			CURLOPT_CONNECTTIMEOUT => 120,
-			CURLOPT_TIMEOUT => 120 ,
-			CURLOPT_COOKIEJAR => dirname(__FILE__) . 'cookie.txt',
-			//CURLOPT_COOKIESESSION => true,
-	);
+			CURLOPT_TIMEOUT => 120,
+			CURLOPT_COOKIEJAR => dirname ( __FILE__ ) . 'cookie.txt')
+	// CURLOPT_COOKIESESSION => true,
+	;
 	$ch = curl_init ( $url );
 	curl_setopt_array ( $ch, $options );
 	$content = curl_exec ( $ch );
@@ -134,5 +130,28 @@ function getDOMFromHTMLIDWithCSS($page, $idToSelect, $cssFilePath) {
 	$newdom->appendChild ( $newdom->importNode ( $cloned, TRUE ) );
 	libxml_use_internal_errors ( $internalErrors );
 	return $newdom;
+}
+function classOccupation($chat_id, $classname) {
+	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAula.do?spazi___model___formbean___RicercaAvanzataAuleVO___postBack=true&spazi___model___formbean___RicercaAvanzataAuleVO___formMode=FILTER&default_event=evn_ricerca_aula_semplice&spazi___model___formbean___RicercaAvanzataAuleVO___sede=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___sigla=" . $classname . "&spazi___model___formbean___RicercaAvanzataAuleVO___categoriaScelta=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___tipologiaScelta=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___iddipScelto=tutti&spazi___model___formbean___RicercaAvanzataAuleVO___soloPreseElettriche_default=N&spazi___model___formbean___RicercaAvanzataAuleVO___soloPreseDiRete_default=N&evn_ricerca_avanzata=Ricerca+aula";
+	$result = getHTMLCurlResponse ( $url );
+	$class=extractClassName($result);
+	$myfile = fopen ( "aula.html", "w" );
+	fwrite ( $myfile, $domOfHTML->saveHTML () );
+	fclose ( $myfile );
+	sendNewFile ( "sendDocument", array (
+			'chat_id' => $chat_id,
+			'document' => new CURLFile ( $fileNamePath )
+	) );
+}
+function extractClassName($page) {
+	$dom = new DOMDocument ();
+	$internalErrors = libxml_use_internal_errors ( true );
+	$dom->loadHTML ( $page );
+	$finder = new DomXPath($dom);
+	$classname="TestoSX Dati1";
+	$nodes = $finder->query("//td[contains(@class, '$classname')]");
+	error_log(var_dump($nodes));
+	//$class=$nodes[1][1];
+	//return $classText;
 }
 ?>
