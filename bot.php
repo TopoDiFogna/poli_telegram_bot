@@ -136,6 +136,8 @@ function classOccupation($chat_id, $classname) {
 	$result = getHTMLCurlResponse ( $url );
 	$class=extractClassName($result);
 	$myfile = fopen ( "aula.html", "w" );
+	$dom = new DOMDocument ();
+	$dom->loadHTML ( $page );
 	fwrite ( $myfile, $domOfHTML->saveHTML () );
 	fclose ( $myfile );
 	sendNewFile ( "sendDocument", array (
