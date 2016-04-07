@@ -87,7 +87,6 @@ function occupationOfTheDay($chat_id) {
 	) );
 }
 function createOccupationFile() {
-	error_log ( "created occupation.html" );
 	$day = date ( 'j' );
 	$month = date ( 'n' );
 	$year = date ( 'Y' );
@@ -112,7 +111,7 @@ function getHTMLCurlResponse($url) {
 			CURLOPT_CONNECTTIMEOUT => 120,
 			CURLOPT_TIMEOUT => 120 ,
 			CURLOPT_COOKIEJAR => dirname(__FILE__) . 'cookie.txt',
-			CURLOPT_COOKIESESSION => true,
+			//CURLOPT_COOKIESESSION => true,
 	);
 	$ch = curl_init ( $url );
 	curl_setopt_array ( $ch, $options );
