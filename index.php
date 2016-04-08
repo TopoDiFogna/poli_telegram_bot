@@ -1,6 +1,7 @@
 <?php
 include_once 'network.php';
 include_once 'bot.php';
+include_once 'xmlUtils.php';
 
 //read data from the request
 $content = file_get_contents("php://input");
