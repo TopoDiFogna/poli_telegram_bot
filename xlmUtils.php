@@ -1,4 +1,10 @@
 <?php
+
+/*This Function return the ID of a given Classroom.
+ * paramaters: String contain the name of the class
+ * Return: if the class exists returns the corresponding id,
+ * 		   -1 otherwise.
+ */
 function idOfGivenClassroom($className) {
 	if (is_string ( $className )) {
 		$xmldoc = new DOMDocument ();
