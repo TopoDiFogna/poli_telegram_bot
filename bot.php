@@ -244,9 +244,9 @@ function classFree($chat_id, $startTime, $endTime) {
 				}
 			}
 			if (! ($i == $last)) {
-				$answer=$string."/n";
+				$answer=$answer.$string."/n";
 			} else {
-				$answer=$string;
+				$answer=$answer.$string;
 			}
 		}
 	}
