@@ -48,6 +48,31 @@ function processTextMessage($text, $chat_id, $message_id) {
 				classOccupation ( $chat_id, $command [1] );
 			}
 			break;
+		case "/free":
+			switch (count($command)){
+				case 1:
+					sendMessage ( $chat_id, "Devi passare anche i due orari su cui eseguire la richiesta", array (
+							"reply_to_message_id" => $message_id
+					) );
+					break;
+				case 2:
+					sendMessage ( $chat_id, "Manca un orario", array (
+							"reply_to_message_id" => $message_id
+					) );
+					break;
+				case 3:
+					if($command[1]>$command[2]){
+						sendMessage ( $chat_id, "Il primo orario deve essere inferiore rispetto al secondo orario", array (
+								"reply_to_message_id" => $message_id
+						) );
+						break;
+					}
+					else{
+						classFree($chat_id,$command[1],$command[2]);
+						break;
+					}
+			};
+			break;
 		default :
 			sendMessage ( $chat_id, "Cool", array (
 					"reply_to_message_id" => $message_id 
@@ -82,6 +107,7 @@ function occupationOfTheDay($chat_id) {
 			'document' => new CURLFile ( $fileNamePath ) 
 	) );
 }
+
 function createOccupationFile() {
 	$day = date ( 'j' );
 	$month = date ( 'n' );
@@ -95,6 +121,7 @@ function createOccupationFile() {
 	fwrite ( $myfile, $domOfHTML->saveHTML () );
 	fclose ( $myfile );
 }
+
 function getHTMLCurlResponse($url) {
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
@@ -106,15 +133,17 @@ function getHTMLCurlResponse($url) {
 			CURLOPT_ENCODING => '',
 			CURLOPT_CONNECTTIMEOUT => 120,
 			CURLOPT_TIMEOUT => 120,
-			CURLOPT_COOKIEJAR => dirname ( __FILE__ ) . 'cookie.txt')
+			CURLOPT_COOKIEJAR => dirname ( __FILE__ ) . 'cookie.txt' 
+	);
 	// CURLOPT_COOKIESESSION => true,
-	;
+	
 	$ch = curl_init ( $url );
 	curl_setopt_array ( $ch, $options );
 	$content = curl_exec ( $ch );
 	curl_close ( $ch );
 	return $content;
 }
+
 function getDOMFromHTMLIDWithCSS($page, $idToSelect, $cssFilePath) {
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
@@ -131,10 +160,11 @@ function getDOMFromHTMLIDWithCSS($page, $idToSelect, $cssFilePath) {
 	libxml_use_internal_errors ( $internalErrors );
 	return $newdom;
 }
+
 function classOccupation($chat_id, $classname) {
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAula.do?spazi___model___formbean___RicercaAvanzataAuleVO___postBack=true&spazi___model___formbean___RicercaAvanzataAuleVO___formMode=FILTER&default_event=evn_ricerca_aula_semplice&spazi___model___formbean___RicercaAvanzataAuleVO___sede=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___sigla=" . $classname . "&spazi___model___formbean___RicercaAvanzataAuleVO___categoriaScelta=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___tipologiaScelta=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___iddipScelto=tutti&spazi___model___formbean___RicercaAvanzataAuleVO___soloPreseElettriche_default=N&spazi___model___formbean___RicercaAvanzataAuleVO___soloPreseDiRete_default=N&evn_ricerca_avanzata=Ricerca+aula";
 	$result = getHTMLCurlResponse ( $url );
-	$class=extractClassName($result);
+	$class = extractClassName ( $result );
 	$myfile = fopen ( "aula.html", "w" );
 	$dom = new DOMDocument ();
 	$dom->loadHTML ( $page );
@@ -142,18 +172,150 @@ function classOccupation($chat_id, $classname) {
 	fclose ( $myfile );
 	sendNewFile ( "sendDocument", array (
 			'chat_id' => $chat_id,
-			'document' => new CURLFile ( $fileNamePath )
+			'document' => new CURLFile ( $fileNamePath ) 
 	) );
 }
+
 function extractClassName($page) {
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
 	$dom->loadHTML ( $page );
-	$finder = new DomXPath($dom);
-	$classname="TestoSX Dati1";
-	$nodes = $finder->query("//td[contains(@class, '$classname')]");
-	error_log(var_dump($nodes));
-	//$class=$nodes[1][1];
-	//return $classText;
+	$finder = new DomXPath ( $dom );
+	$classname = "TestoSX Dati1";
+	$nodes = $finder->query ( "//td[contains(@class, '$classname')]" );
+	error_log ( var_dump ( $nodes ) );
+	// $class=$nodes[1][1];
+	// return $classText;
+}
+
+function classFree($chat_id, $startTime, $endTime) {
+	$day = date ( 'j' );
+	$month = date ( 'n' );
+	$year = date ( 'Y' );
+	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
+	$urlCookies = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAula.do?evn_ricerca_aule_libere=evento&jaf_currentWFID=main";
+	$param = array (
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___postBack' => 'true',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___formMode' => 'FILTER',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___categoriaScelta' => 'D',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___tipologiaScelta' => 'tutte',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___sede' => 'MIA',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___iddipScelto' => 'tutti',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___sigla' => '',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_day' => $day,
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_month' => $month,
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_year' => $year,
+			'jaf_spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_date_format' => 'dd/MM/yyyy',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___orario_dal' => $startTime,
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___orario_al' => $endTime,
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___soloPreseElettriche_default' => 'N',
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___soloPreseDiRete_default' => 'N',
+			'evn_ricerca_avanzata' => 'Ricerca aule libere' 
+	);
+	$boundary = "---------------------------41989678077857697020580537542";
+	$query = multipart_build_query ( $param, $boundary );
+	$cookies = getCookies ( $urlCookies );
+	$cookie = explode ( "; ", $cookies );
+	$session = substr ( $cookie [0], 1 );
+	$result = postHTMLCurlResponse ( $url, $query, $session );
+	$dom = new DOMDocument ();
+	$internalErrors = libxml_use_internal_errors ( true );
+	$dom->loadHTML ( $result );
+	$selection = $dom->getElementById ( "div_table_aule" );
+	$newdom = new DOMDocument ();
+	$cloned = $selection->cloneNode ( TRUE );
+	$newdom->appendChild ( $newdom->importNode ( $cloned, TRUE ) );
+	$finder = new DomXPath ( $newdom );
+	$nodes = $finder->query ( '//tbody[@class="TableDati-tbody"]' );
+	$node = $nodes->item ( 0 );
+	$answer="";
+	if ($node->hasChildNodes ()) {
+		$parents = $node->childNodes;
+		$last = ($parents->length) - 1;
+		foreach ( $parents as $i => $parent ) {
+			$childs = $parent->childNodes;
+			$string = "";
+			foreach ( $childs as $j => $child ) {
+				if ($j == 2) {
+					if ($child->hasChildNodes ()) {
+						$className = $child->childNodes->item ( 1 )->nodeValue;
+						$string = $string . $className;
+					}
+				}
+			}
+			if (! ($i == $last)) {
+				$answer=$string."/n";
+			} else {
+				$answer=$string;
+			}
+		}
+	}
+	sendMessage ( $chat_id, $answer, array (
+			'parse_mode' => 'Markdown'
+	) );
+}
+
+function postHTMLCurlResponse($url, $params, $cookieString) {
+	$options = array (
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
+			CURLOPT_AUTOREFERER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_CONNECTTIMEOUT => 120,
+			CURLOPT_TIMEOUT => 120,
+			CURLOPT_POSTFIELDS => $params,
+			CURLOPT_POST => true,
+			CURLOPT_HTTPHEADER => array (
+					"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+					"Accept-Language: en-US,en;q=0.5",
+					"Accept-Encoding: gzip, deflate, br",
+					"Cookie: _ga=GA1.2.112926790.1459958705; " . $cookieString,
+					"Connection : keep-alive",
+					"Cache-Control: max-age=0",
+					"Content-Type: multipart/form-data; boundary=---------------------------41989678077857697020580537542",
+					"Content-Length: " . strlen ( $params ) 
+			) 
+	);
+	$ch = curl_init ( $url );
+	curl_setopt_array ( $ch, $options );
+	$content = curl_exec ( $ch );
+	curl_close ( $ch );
+	return $content;
+}
+
+function getCookies($url) {
+	// open a site with cookies
+	$ch = curl_init ();
+	curl_setopt ( $ch, CURLOPT_URL, $url );
+	curl_setopt ( $ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0' );
+	curl_setopt ( $ch, CURLOPT_HEADER, 1 );
+	curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+	curl_setopt ( $ch, CURLOPT_FOLLOWLOCATION, 1 );
+	curl_setopt ( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
+	curl_setopt ( $ch, CURLOPT_COOKIEJAR, 'cookie.txt' );
+	$content = curl_exec ( $ch );
+	
+	// get cookies
+	$cookies = array ();
+	preg_match_all ( '/Set-Cookie:(?<cookie>\s{0,}.*)$/im', $content, $cookies );
+	
+	print_r ( $cookies ['cookie'] ); // show harvested cookies
+	$cookieString = $cookies ['cookie'] [0];
+	return $cookieString;
+	// basic parsing of cookie strings (just an example)
+	// $cookieParts = array();
+	// preg_match_all('/Set-Cookie:\s{0,}(?P<name>[^=]*)=(?P<value>[^;]*).*?expires=(?P<expires>[^;]*).*?path=(?P<path>[^;]*).*?domain=(?P<domain>[^\s;]*).*?$/im', $content, $cookieParts);
+	// print_r($cookieParts);
+}
+
+function multipart_build_query($fields, $boundary) {
+	$retval = '';
+	foreach ( $fields as $key => $value ) {
+		$retval .= "--$boundary\nContent-Disposition: form-data; name=\"$key\"\n\n$value\n";
+	}
+	$retval .= "--$boundary--";
+	return $retval;
 }
 ?>
