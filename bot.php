@@ -68,11 +68,36 @@ function processTextMessage($text, $chat_id, $message_id) {
 						break;
 					}
 					else{
-						classFree($chat_id,$command[1],$command[2]);
+						classFree($chat_id,$command[1],$command[2],false);
 						break;
 					}
 			};
 			break;
+			case "/freed":
+				switch (count($command)){
+					case 1:
+						sendMessage ( $chat_id, "Devi passare anche i due orari su cui eseguire la richiesta", array (
+						"reply_to_message_id" => $message_id
+						) );
+						break;
+					case 2:
+						sendMessage ( $chat_id, "Manca un orario", array (
+						"reply_to_message_id" => $message_id
+						) );
+						break;
+					case 3:
+						if($command[1]>$command[2]){
+							sendMessage ( $chat_id, "Il primo orario deve essere inferiore rispetto al secondo orario", array (
+									"reply_to_message_id" => $message_id
+							) );
+							break;
+						}
+						else{
+							classFree($chat_id,$command[1],$command[2],true);
+							break;
+						}
+				};
+				break;
 		default :
 			sendMessage ( $chat_id, "Cool", array (
 					"reply_to_message_id" => $message_id 
@@ -188,8 +213,11 @@ function extractClassName($page) {
 	// return $classText;
 }
 
-function classFree($chat_id, $startTime, $endTime) {
+function classFree($chat_id, $startTime, $endTime,$tomorrow) {
 	$day = date ( 'j' );
+	if($tomorrow){
+		$day=$day+1;
+	}
 	$month = date ( 'n' );
 	$year = date ( 'Y' );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
