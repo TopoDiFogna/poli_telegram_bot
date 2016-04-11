@@ -189,7 +189,7 @@ function getDOMFromHTMLIDWithCSS($page, $idToSelect, $cssFilePath) {
 	libxml_use_internal_errors ( $internalErrors );
 	return $newdom;
 }
-function classOccupation($chat_id, $classname, $tomorrow) {
+function classOccupation($chat_id, $className, $tomorrow) {
 	$day = date ( "j" );
 	$month = date ( "n" );
 	$year = date ( "Y" );
