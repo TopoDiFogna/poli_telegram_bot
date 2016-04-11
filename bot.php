@@ -45,7 +45,7 @@ function processTextMessage($text, $chat_id, $message_id) {
 						"reply_to_message_id" => $message_id 
 				) );
 			} else {
-				classOccupation ( $chat_id, $command [1] );
+				classOccupation ( $chat_id, $command [1], true );
 			}
 			break;
 		case "/free" :
@@ -137,7 +137,7 @@ function createOccupationFile() {
 	$month = date ( 'n' );
 	$year = date ( 'Y' );
 	$url = 'https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=' . $day . '&giorno_month=' . $month . '&giorno_year=' . $year . '&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
-	$result = getHTMLCurlResponse ( $url , "");
+	$result = getHTMLCurlResponse ( $url, "" );
 	
 	$domOfHTML = getDOMFromHTMLIDWithCSS ( $result, 'tableContainer', "spazi/table-MOZ.css" );
 	
@@ -145,7 +145,7 @@ function createOccupationFile() {
 	fwrite ( $myfile, $domOfHTML->saveHTML () );
 	fclose ( $myfile );
 }
-function getHTMLCurlResponse($url,$cookie) {
+function getHTMLCurlResponse($url, $cookie) {
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER => false,
@@ -157,17 +157,17 @@ function getHTMLCurlResponse($url,$cookie) {
 			CURLOPT_CONNECTTIMEOUT => 120,
 			CURLOPT_TIMEOUT => 120 
 	);
-
+	
 	$ch = curl_init ( $url );
 	curl_setopt_array ( $ch, $options );
-	if (strlen($cookie)>0) {
-		curl_setopt($ch, CURL_HTTPHEADER, array(
+	if (strlen ( $cookie ) > 0) {
+		curl_setopt ( $ch, CURL_HTTPHEADER, array (
 				"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 				"Accept-Language: en-US,en;q=0.5",
 				"Accept-Encoding: gzip, deflate, br",
 				"Cookie: " . $cookie,
-				"Connection : keep-alive",
-		));
+				"Connection : keep-alive" 
+		) );
 	}
 	$content = curl_exec ( $ch );
 	curl_close ( $ch );
@@ -190,30 +190,30 @@ function getDOMFromHTMLIDWithCSS($page, $idToSelect, $cssFilePath) {
 	return $newdom;
 }
 function classOccupation($chat_id, $classname, $tomorrow) {
-	$day=date("j");
-	$month=date("n");
-	$year=date("Y");
+	$day = date ( "j" );
+	$month = date ( "n" );
+	$year = date ( "Y" );
 	$classId = idOfGivenClassroom ( $className );
-	if($classId!=-1){
-	$cocckieUrl ="https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?evn_init=event&idaula=" . $classId . "&jaf_currentWFID=main";
-	$cookies = getCookies ( $cookieUrl );
-	$cookie = explode ( "; ", $cookies );
-	$session = substr ( $cookie [0], 1 );
-	$url="https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?idaula=".$classId."&fromData_day=".$day."&fromData_month=".$month."&fromData_year=".$year."&jaf_fromData_date_format=dd%2FMM%2Fyyyy&toData_day=".$day."&toData_month=".$month."&toData_year=".$year."&jaf_toData_date_format=dd%2FMM%2Fyyyy&evn_occupazioni=Visualizza+occupazioni";
-	$response=getHTMLCurlResponse($url, $cookie);
-	$dom=getDOMFromHTMLIDWithCSS($response, 'tableContainer', "spazi/table-MOZ.css");
-	$myfile = fopen ( $classId, "w" );
-	fwrite ( $myfile, $domOfHTML->saveHTML () );
-	fclose ( $myfile );
-	$cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/'.$classId.'.png /var/www/telegrambot/'.$classId;
-	shell_exec ( $cmdLine );
-	$fileNamePath=realpath($classId.'.png');
-	sendNewFile ( "sendPhoto", array (
-			'chat_id' => $chat_id,
-			'document' => new CURLFile ( $fileNamePath )
-	) );
-	}
-	else sendMessage($chat_id, "La classe non esiste", array());
+	if ($classId != - 1) {
+		$cocckieUrl = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?evn_init=event&idaula=" . $classId . "&jaf_currentWFID=main";
+		$cookies = getCookies ( $cookieUrl );
+		$cookie = explode ( "; ", $cookies );
+		$session = substr ( $cookie [0], 1 );
+		$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?idaula=" . $classId . "&fromData_day=" . $day . "&fromData_month=" . $month . "&fromData_year=" . $year . "&jaf_fromData_date_format=dd%2FMM%2Fyyyy&toData_day=" . $day . "&toData_month=" . $month . "&toData_year=" . $year . "&jaf_toData_date_format=dd%2FMM%2Fyyyy&evn_occupazioni=Visualizza+occupazioni";
+		$response = getHTMLCurlResponse ( $url, $cookie );
+		$dom = getDOMFromHTMLIDWithCSS ( $response, 'tableContainer', "spazi/table-MOZ.css" );
+		$myfile = fopen ( $classId, "w" );
+		fwrite ( $myfile, $domOfHTML->saveHTML () );
+		fclose ( $myfile );
+		$cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/' . $classId . '.png /var/www/telegrambot/' . $classId;
+		shell_exec ( $cmdLine );
+		$fileNamePath = realpath ( $classId . '.png' );
+		sendNewFile ( "sendPhoto", array (
+				'chat_id' => $chat_id,
+				'document' => new CURLFile ( $fileNamePath ) 
+		) );
+	} else
+		sendMessage ( $chat_id, "La classe non esiste", array () );
 }
 function extractClassName($page) {
 	$dom = new DOMDocument ();
