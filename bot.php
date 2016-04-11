@@ -198,7 +198,7 @@ function classOccupation($chat_id, $className, $tomorrow) {
 		$session = substr ( $cookie [0], 1 );
 		$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?idaula=" . $classId . "&fromData_day=" . $day . "&fromData_month=" . $month . "&fromData_year=" . $year . "&jaf_fromData_date_format=dd%2FMM%2Fyyyy&toData_day=" . $day . "&toData_month=" . $month . "&toData_year=" . $year . "&jaf_toData_date_format=dd%2FMM%2Fyyyy&evn_occupazioni=Visualizza+occupazioni";
 		$response = getHTMLCurlResponse ( $url, $session);
-		$dom = getDOMFromHTMLIDWithCSS ( $response, 'tableContainer', "spazi/table-MOZ.css" );
+		$domOfHTML = getDOMFromHTMLIDWithCSS ( $response, 'tableContainer', "spazi/table-MOZ.css" );
 		$myfile = fopen ( $classId, "w" );
 		fwrite ( $myfile, $domOfHTML->saveHTML () );
 		fclose ( $myfile );
