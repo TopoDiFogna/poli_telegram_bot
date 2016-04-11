@@ -48,56 +48,56 @@ function processTextMessage($text, $chat_id, $message_id) {
 				classOccupation ( $chat_id, $command [1] );
 			}
 			break;
-		case "/free":
-			switch (count($command)){
-				case 1:
+		case "/free" :
+			switch (count ( $command )) {
+				case 1 :
 					sendMessage ( $chat_id, "Devi passare anche i due orari su cui eseguire la richiesta", array (
-							"reply_to_message_id" => $message_id
+							"reply_to_message_id" => $message_id 
 					) );
 					break;
-				case 2:
+				case 2 :
 					sendMessage ( $chat_id, "Manca un orario", array (
-							"reply_to_message_id" => $message_id
+							"reply_to_message_id" => $message_id 
 					) );
 					break;
-				case 3:
-					if($command[1]>$command[2]){
+				case 3 :
+					if ($command [1] > $command [2]) {
 						sendMessage ( $chat_id, "Il primo orario deve essere inferiore rispetto al secondo orario", array (
-								"reply_to_message_id" => $message_id
+								"reply_to_message_id" => $message_id 
 						) );
 						break;
-					}
-					else{
-						classFree($chat_id,$command[1],$command[2],false);
+					} else {
+						classFree ( $chat_id, $command [1], $command [2], false );
 						break;
 					}
-			};
+			}
+			;
 			break;
-			case "/freed":
-				switch (count($command)){
-					case 1:
-						sendMessage ( $chat_id, "Devi passare anche i due orari su cui eseguire la richiesta", array (
-						"reply_to_message_id" => $message_id
+		case "/freed" :
+			switch (count ( $command )) {
+				case 1 :
+					sendMessage ( $chat_id, "Devi passare anche i due orari su cui eseguire la richiesta", array (
+							"reply_to_message_id" => $message_id 
+					) );
+					break;
+				case 2 :
+					sendMessage ( $chat_id, "Manca un orario", array (
+							"reply_to_message_id" => $message_id 
+					) );
+					break;
+				case 3 :
+					if ($command [1] > $command [2]) {
+						sendMessage ( $chat_id, "Il primo orario deve essere inferiore rispetto al secondo orario", array (
+								"reply_to_message_id" => $message_id 
 						) );
 						break;
-					case 2:
-						sendMessage ( $chat_id, "Manca un orario", array (
-						"reply_to_message_id" => $message_id
-						) );
+					} else {
+						classFree ( $chat_id, $command [1], $command [2], true );
 						break;
-					case 3:
-						if($command[1]>$command[2]){
-							sendMessage ( $chat_id, "Il primo orario deve essere inferiore rispetto al secondo orario", array (
-									"reply_to_message_id" => $message_id
-							) );
-							break;
-						}
-						else{
-							classFree($chat_id,$command[1],$command[2],true);
-							break;
-						}
-				};
-				break;
+					}
+			}
+			;
+			break;
 		default :
 			sendMessage ( $chat_id, "Cool", array (
 					"reply_to_message_id" => $message_id 
@@ -132,13 +132,12 @@ function occupationOfTheDay($chat_id) {
 			'document' => new CURLFile ( $fileNamePath ) 
 	) );
 }
-
 function createOccupationFile() {
 	$day = date ( 'j' );
 	$month = date ( 'n' );
 	$year = date ( 'Y' );
 	$url = 'https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=' . $day . '&giorno_month=' . $month . '&giorno_year=' . $year . '&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
-	$result = getHTMLCurlResponse ( $url );
+	$result = getHTMLCurlResponse ( $url , "");
 	
 	$domOfHTML = getDOMFromHTMLIDWithCSS ( $result, 'tableContainer', "spazi/table-MOZ.css" );
 	
@@ -146,8 +145,7 @@ function createOccupationFile() {
 	fwrite ( $myfile, $domOfHTML->saveHTML () );
 	fclose ( $myfile );
 }
-
-function getHTMLCurlResponse($url) {
+function getHTMLCurlResponse($url,$cookie) {
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER => false,
@@ -157,18 +155,24 @@ function getHTMLCurlResponse($url) {
 			CURLOPT_AUTOREFERER => true,
 			CURLOPT_ENCODING => '',
 			CURLOPT_CONNECTTIMEOUT => 120,
-			CURLOPT_TIMEOUT => 120,
-			CURLOPT_COOKIEJAR => dirname ( __FILE__ ) . 'cookie.txt' 
+			CURLOPT_TIMEOUT => 120 
 	);
-	// CURLOPT_COOKIESESSION => true,
-	
+
 	$ch = curl_init ( $url );
 	curl_setopt_array ( $ch, $options );
+	if (strlen($cookie)>0) {
+		curl_setopt($ch, CURL_HTTPHEADER, array(
+				"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+				"Accept-Language: en-US,en;q=0.5",
+				"Accept-Encoding: gzip, deflate, br",
+				"Cookie: " . $cookie,
+				"Connection : keep-alive",
+		));
+	}
 	$content = curl_exec ( $ch );
 	curl_close ( $ch );
 	return $content;
 }
-
 function getDOMFromHTMLIDWithCSS($page, $idToSelect, $cssFilePath) {
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
@@ -185,22 +189,29 @@ function getDOMFromHTMLIDWithCSS($page, $idToSelect, $cssFilePath) {
 	libxml_use_internal_errors ( $internalErrors );
 	return $newdom;
 }
-
-function classOccupation($chat_id, $classname) {
-	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAula.do?spazi___model___formbean___RicercaAvanzataAuleVO___postBack=true&spazi___model___formbean___RicercaAvanzataAuleVO___formMode=FILTER&default_event=evn_ricerca_aula_semplice&spazi___model___formbean___RicercaAvanzataAuleVO___sede=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___sigla=" . $classname . "&spazi___model___formbean___RicercaAvanzataAuleVO___categoriaScelta=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___tipologiaScelta=tutte&spazi___model___formbean___RicercaAvanzataAuleVO___iddipScelto=tutti&spazi___model___formbean___RicercaAvanzataAuleVO___soloPreseElettriche_default=N&spazi___model___formbean___RicercaAvanzataAuleVO___soloPreseDiRete_default=N&evn_ricerca_avanzata=Ricerca+aula";
-	$result = getHTMLCurlResponse ( $url );
-	$class = extractClassName ( $result );
-	$myfile = fopen ( "aula.html", "w" );
-	$dom = new DOMDocument ();
-	$dom->loadHTML ( $page );
+function classOccupation($chat_id, $classname, $tomorrow) {
+	$day=date("j");
+	$month=date("n");
+	$year=date("Y");
+	$classId = idOfGivenClassroom ( $className );
+	$cocckieUrl ="https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?evn_init=event&idaula=" . $classId . "&jaf_currentWFID=main";
+	$cookies = getCookies ( $cookieUrl );
+	$cookie = explode ( "; ", $cookies );
+	$session = substr ( $cookie [0], 1 );
+	$url="https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?idaula=".$classId."&fromData_day=".$day."&fromData_month=".$month."&fromData_year=".$year."&jaf_fromData_date_format=dd%2FMM%2Fyyyy&toData_day=".$day."&toData_month=".$month."&toData_year=".$year."&jaf_toData_date_format=dd%2FMM%2Fyyyy&evn_occupazioni=Visualizza+occupazioni";
+	$response=getHTMLCurlResponse($url, $cookie);
+	$dom=getDOMFromHTMLIDWithCSS($response, 'tableContainer', "spazi/table-MOZ.css");
+	$myfile = fopen ( $classId, "w" );
 	fwrite ( $myfile, $domOfHTML->saveHTML () );
 	fclose ( $myfile );
-	sendNewFile ( "sendDocument", array (
+	$cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/'.$classId.'.png /var/www/telegrambot/'.$classId;
+	shell_exec ( $cmdLine );
+	$fileNamePath=realpath($classId.'.png');
+	sendNewFile ( "sendPhoto", array (
 			'chat_id' => $chat_id,
-			'document' => new CURLFile ( $fileNamePath ) 
+			'document' => new CURLFile ( $fileNamePath )
 	) );
 }
-
 function extractClassName($page) {
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
@@ -212,11 +223,10 @@ function extractClassName($page) {
 	// $class=$nodes[1][1];
 	// return $classText;
 }
-
-function classFree($chat_id, $startTime, $endTime,$tomorrow) {
+function classFree($chat_id, $startTime, $endTime, $tomorrow) {
 	$day = date ( 'j' );
-	if($tomorrow){
-		$day=$day+1;
+	if ($tomorrow) {
+		$day = $day + 1;
 	}
 	$month = date ( 'n' );
 	$year = date ( 'Y' );
@@ -245,6 +255,7 @@ function classFree($chat_id, $startTime, $endTime,$tomorrow) {
 	$cookies = getCookies ( $urlCookies );
 	$cookie = explode ( "; ", $cookies );
 	$session = substr ( $cookie [0], 1 );
+	$session = "_ga=GA1.2.112926790.1459958705; " . $session;
 	$result = postHTMLCurlResponse ( $url, $query, $session );
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
@@ -256,7 +267,7 @@ function classFree($chat_id, $startTime, $endTime,$tomorrow) {
 	$finder = new DomXPath ( $newdom );
 	$nodes = $finder->query ( '//tbody[@class="TableDati-tbody"]' );
 	$node = $nodes->item ( 0 );
-	$answer="";
+	$answer = "";
 	if ($node->hasChildNodes ()) {
 		$parents = $node->childNodes;
 		$last = ($parents->length) - 1;
@@ -272,17 +283,16 @@ function classFree($chat_id, $startTime, $endTime,$tomorrow) {
 				}
 			}
 			if (! ($i == $last)) {
-				$answer=$answer.$string."\n";
+				$answer = $answer . $string . "\n";
 			} else {
-				$answer=$answer.$string;
+				$answer = $answer . $string;
 			}
 		}
 	}
 	sendMessage ( $chat_id, $answer, array (
-			'parse_mode' => 'Markdown'
+			'parse_mode' => 'Markdown' 
 	) );
 }
-
 function postHTMLCurlResponse($url, $params, $cookieString) {
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
@@ -299,7 +309,7 @@ function postHTMLCurlResponse($url, $params, $cookieString) {
 					"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 					"Accept-Language: en-US,en;q=0.5",
 					"Accept-Encoding: gzip, deflate, br",
-					"Cookie: _ga=GA1.2.112926790.1459958705; " . $cookieString,
+					"Cookie: " . $cookieString,
 					"Connection : keep-alive",
 					"Cache-Control: max-age=0",
 					"Content-Type: multipart/form-data; boundary=---------------------------41989678077857697020580537542",
@@ -312,7 +322,6 @@ function postHTMLCurlResponse($url, $params, $cookieString) {
 	curl_close ( $ch );
 	return $content;
 }
-
 function getCookies($url) {
 	// open a site with cookies
 	$ch = curl_init ();
@@ -337,7 +346,6 @@ function getCookies($url) {
 	// preg_match_all('/Set-Cookie:\s{0,}(?P<name>[^=]*)=(?P<value>[^;]*).*?expires=(?P<expires>[^;]*).*?path=(?P<path>[^;]*).*?domain=(?P<domain>[^\s;]*).*?$/im', $content, $cookieParts);
 	// print_r($cookieParts);
 }
-
 function multipart_build_query($fields, $boundary) {
 	$retval = '';
 	foreach ( $fields as $key => $value ) {
