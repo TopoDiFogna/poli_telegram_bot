@@ -161,13 +161,10 @@ function getHTMLCurlResponse($url, $cookie) {
 	$ch = curl_init ( $url );
 	curl_setopt_array ( $ch, $options );
 	if (strlen ( $cookie ) > 0) {
-		curl_setopt ( $ch, CURL_HTTPHEADER, array (
-				"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-				"Accept-Language: en-US,en;q=0.5",
-				"Accept-Encoding: gzip, deflate, br",
+		echo("sono nell'if");
+		curl_setopt ( $ch, CURLOPT_HTTPHEADER, array (
 				"Cookie: " . $cookie,
-				"Connection : keep-alive" 
-		) );
+		));
 	}
 	$content = curl_exec ( $ch );
 	curl_close ( $ch );
@@ -200,7 +197,7 @@ function classOccupation($chat_id, $className, $tomorrow) {
 		$cookie = explode ( "; ", $cookies );
 		$session = substr ( $cookie [0], 1 );
 		$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?idaula=" . $classId . "&fromData_day=" . $day . "&fromData_month=" . $month . "&fromData_year=" . $year . "&jaf_fromData_date_format=dd%2FMM%2Fyyyy&toData_day=" . $day . "&toData_month=" . $month . "&toData_year=" . $year . "&jaf_toData_date_format=dd%2FMM%2Fyyyy&evn_occupazioni=Visualizza+occupazioni";
-		$response = getHTMLCurlResponse ( $url, $cookie );
+		$response = getHTMLCurlResponse ( $url, $session);
 		$dom = getDOMFromHTMLIDWithCSS ( $response, 'tableContainer', "spazi/table-MOZ.css" );
 		$myfile = fopen ( $classId, "w" );
 		fwrite ( $myfile, $domOfHTML->saveHTML () );
@@ -329,7 +326,7 @@ function getCookies($url) {
 	// open a site with cookies
 	$ch = curl_init ();
 	curl_setopt ( $ch, CURLOPT_URL, $url );
-	curl_setopt ( $ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0' );
+	curl_setopt ( $ch, CURLOPT_USERAGENT,  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36' );
 	curl_setopt ( $ch, CURLOPT_HEADER, 1 );
 	curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $ch, CURLOPT_FOLLOWLOCATION, 1 );
