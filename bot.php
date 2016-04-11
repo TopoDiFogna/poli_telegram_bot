@@ -205,6 +205,7 @@ function classOccupation($chat_id, $className, $tomorrow) {
 		$cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/' . $classId . '.png /var/www/telegrambot/' . $classId;
 		shell_exec ( $cmdLine );
 		$fileNamePath = realpath ( $classId . '.png' );
+		error_log($fileNamePath);
 		sendNewFile ( "sendPhoto", array (
 				'chat_id' => $chat_id,
 				'document' => new CURLFile ( $fileNamePath ) 
