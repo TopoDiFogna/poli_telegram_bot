@@ -1,10 +1,16 @@
 <?php
+
+/**
+ * Process the incoming message
+ * 
+ * @param String $message the message received to process
+ */
 function processMessage($message) {
-	// process incoming message
 	$message_id = $message ['message_id']; // used in replies
 	
 	$chat_id = $message ['chat'] ['id']; // chat to send the message to
-	
+	                                     
+	// checks what type of message is incoming and perform the correct operation
 	switch ($message) {
 		case array_key_exists ( 'text', $message ) :
 			$text_message = $message ['text'];
@@ -28,6 +34,16 @@ function processMessage($message) {
 			break;
 	}
 }
+/**
+ * Parses the incoming text message and perform the approrpiate action
+ *
+ * @param String $text
+ *        	the string containing the message to parse
+ * @param int $chat_id
+ *        	the chat id to reply to
+ * @param int $message_id
+ *        	the id of the message to reply to
+ */
 function processTextMessage($text, $chat_id, $message_id) {
 	$command = explode ( " ", $text );
 	switch ($command [0]) {
@@ -105,9 +121,16 @@ function processTextMessage($text, $chat_id, $message_id) {
 			break;
 	}
 }
+
+/**
+ * Sends the welcome message
+ * 
+ * @param int $chat_id chat to send the message to
+ * @param int $message_id message to send the reply to
+ */
 function startFunction($chat_id, $message_id) {
-	$file = fopen ( "start.txt", "r" );
-	$response = fread ( $file, filesize ( "start.txt" ) );
+	$file = fopen ( "./spazi/start.txt", "r" );
+	$response = fread ( $file, filesize ( "./spazi/start.txt" ) );
 	fclose ( $file );
 	sendMessage ( $chat_id, $response, array (
 			'parse_mode' => 'Markdown' 
@@ -116,7 +139,7 @@ function startFunction($chat_id, $message_id) {
 function occupationOfTheDay($chat_id) {
 	$fileNamePath = realpath ( 'occupation.html' );
 	
-	if (! file_exists ( $fileNamePath )) {
+	if (! $fileNamePath) {
 		createOccupationFile ();
 	}
 	
