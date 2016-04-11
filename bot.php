@@ -53,7 +53,7 @@ function processTextMessage($text, $chat_id, $message_id) {
 		case "/stop" :
 			break;
 		case "/occupation" :
-			occupationOfTheDay ( $chat_id );
+			occupationOfTheDay ( $chat_id, $command [1] );
 			break;
 		case "/classroom" :
 			if (! isset ( $command [1] )) {
@@ -124,51 +124,61 @@ function processTextMessage($text, $chat_id, $message_id) {
 
 /**
  * Sends the welcome message
- * 
- * @param int $chat_id chat to send the message to
- * @param int $message_id message to send the reply to
+ *
+ * @param int $chat_id
+ *        	chat to send the message to
+ * @param int $message_id
+ *        	message to send the reply to
  */
 function startFunction($chat_id, $message_id) {
-	$file = fopen ( "./spazi/start.txt", "r" );
-	$response = fread ( $file, filesize ( "./spazi/start.txt" ) );
+	$filePath = "./spazi/start.txt";
+	$file = fopen ( $filePath, "r" );
+	$response = fread ( $file, filesize ( $filePath ) );
 	fclose ( $file );
 	sendMessage ( $chat_id, $response, array (
 			'parse_mode' => 'Markdown' 
 	) );
 }
-function occupationOfTheDay($chat_id) {
-	$fileNamePath = realpath ( 'occupation.html' );
+
+/**
+ * Creates an HTML file containing the occupation of the specified day
+ *
+ * @param int $chat_id
+ *        	the chat id to reply to
+ * @param String $date
+ *        	the date of the day to retrieve the occupation
+ */
+function occupationOfTheDay($chat_id, $date) {
+	$filePath = "./files/occupation.html";
 	
-	if (! $fileNamePath) {
-		createOccupationFile ();
+	if (! file_exists ( $filePath )) {
+		$result = createOccupationFile ();
 	}
 	
-	if (time () - filemtime ( $fileNamePath ) > 3600 * 2) {
-		createOccupationFile ();
+	if (time () - filemtime ( $filePath ) > 3600 * 2) {
+		$result = createOccupationFile ();
 	}
-	
+	if ($result) {
+		sendNewFile ( "sendDocument", array (
+				'chat_id' => $chat_id,
+				'document' => new CURLFile ( $fileNamePath ) 
+		) );
+	} else {
+		error_log ( "Error creating file in function occupationOfTheDay" );
+	}
 	// $cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
 	// shell_exec ( $cmdLine );
-	
-	sendNewFile ( "sendDocument", array (
-			'chat_id' => $chat_id,
-			'document' => new CURLFile ( $fileNamePath ) 
-	) );
 }
-function createOccupationFile() {
-	$day = date ( 'j' );
-	$month = date ( 'n' );
-	$year = date ( 'Y' );
-	$url = 'https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=' . $day . '&giorno_month=' . $month . '&giorno_year=' . $year . '&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
-	$result = getHTMLCurlResponse ( $url, "" );
-	
-	$domOfHTML = getDOMFromHTMLIDWithCSS ( $result, 'tableContainer', "spazi/table-MOZ.css" );
-	
-	$myfile = fopen ( "occupation.html", "w" );
-	fwrite ( $myfile, $domOfHTML->saveHTML () );
-	fclose ( $myfile );
-}
-function getHTMLCurlResponse($url, $cookie) {
+/**
+ * Creates the HTML file with the occupation for the specified date
+ *
+ * @param String $time
+ *        	the day to create the file
+ * @return false if an error occours creating the file otherwise returns true
+ */
+function createOccupationFile($time) {
+	$date = strtotime ( $time );
+	$url = 'https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=' . date ( "j", $date ) . '&giorno_month=' . date ( "n", $date ) . '&giorno_year=' . date ( "Y", $date ) . '&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER => false,
@@ -176,13 +186,42 @@ function getHTMLCurlResponse($url, $cookie) {
 			CURLOPT_MAXREDIRS => 10,
 			CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
 			CURLOPT_AUTOREFERER => true,
-			CURLOPT_ENCODING => '',
+			CURLOPT_ENCODING => "",
 			CURLOPT_CONNECTTIMEOUT => 120,
 			CURLOPT_TIMEOUT => 120 
 	);
+	$result = cUrlGetRequest ( $url, $options );
+	echo ($url);
 	
-	$ch = curl_init ( $url );
-	curl_setopt_array ( $ch, $options );
+	if ($result == false) {
+		error_log ( "Error calling cUrlGetRequest from createOccupationFile function" );
+		return false;
+	}
+	
+	$domOfHTML = getDOMFromHTMLIdWithCSS ( $result, 'tableContainer', "spazi/table-MOZ.css" );
+	
+	$file = fopen ( "./files/occupation.html", "w" );
+	fwrite ( $file, $domOfHTML->saveHTML () );
+	fclose ( $file );
+	return true;
+}
+function getHTMLCurlResponse($url, $cookie) {
+	/*
+	 * $options = array (
+	 * CURLOPT_RETURNTRANSFER => true,
+	 * CURLOPT_HEADER => false,
+	 * CURLOPT_FOLLOWLOCATION => true,
+	 * CURLOPT_MAXREDIRS => 10,
+	 * CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
+	 * CURLOPT_AUTOREFERER => true,
+	 * CURLOPT_ENCODING => "",
+	 * CURLOPT_CONNECTTIMEOUT => 120,
+	 * CURLOPT_TIMEOUT => 120
+	 * );
+	 *
+	 * $ch = curl_init ( $url );
+	 * curl_setopt_array ( $ch, $options );
+	 */
 	if (strlen ( $cookie ) > 0) {
 		curl_setopt ( $ch, CURL_HTTPHEADER, array (
 				"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -196,21 +235,32 @@ function getHTMLCurlResponse($url, $cookie) {
 	curl_close ( $ch );
 	return $content;
 }
-function getDOMFromHTMLIDWithCSS($page, $idToSelect, $cssFilePath) {
-	$dom = new DOMDocument ();
-	$internalErrors = libxml_use_internal_errors ( true );
-	$dom->loadHTML ( $page );
-	$my = $dom->getElementById ( $idToSelect );
-	$newdom = new DOMDocument ();
-	$cloned = $my->cloneNode ( TRUE );
+/**
+ * Creates DOM document compiled with html and CSS
+ *
+ * @param String $page
+ *        	the string containing HTML code
+ * @param String $idToSelect
+ *        	id of the element to extract from HTML
+ * @param String $cssFilePath
+ *        	path to the css to include
+ * @return DOMDocument the dom document of the html and css combined
+ */
+function getDOMFromHTMLIdWithCSS($page, $idToSelect, $cssFilePath) {
+	$dom = new DOMDocument (); // creates a new dom document
+	$internalErrors = libxml_use_internal_errors ( true ); // to avoid logging warning for malformed HTML pages
+	$dom->loadHTML ( $page ); // transform HTML to dom file
+	$domElement = $dom->getElementById ( $idToSelect );
+	$newDomWithSelectedId = new DOMDocument ();
+	$cloned = $domElement->cloneNode ( TRUE );
 	$styleFile = fopen ( $cssFilePath, "r" );
 	$style = fread ( $styleFile, filesize ( $cssFilePath ) );
 	fclose ( $styleFile );
-	$element = $newdom->createElement ( 'style', $style );
-	$newdom->appendChild ( $element );
-	$newdom->appendChild ( $newdom->importNode ( $cloned, TRUE ) );
-	libxml_use_internal_errors ( $internalErrors );
-	return $newdom;
+	$element = $newDomWithSelectedId->createElement ( 'style', $style );
+	$newDomWithSelectedId->appendChild ( $element );
+	$newDomWithSelectedId->appendChild ( $newDomWithSelectedId->importNode ( $cloned, TRUE ) );
+	libxml_use_internal_errors ( $internalErrors ); // restore normal logging method
+	return $newDomWithSelectedId;
 }
 function classOccupation($chat_id, $className, $tomorrow) {
 	$day = date ( "j" );
