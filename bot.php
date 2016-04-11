@@ -159,9 +159,9 @@ function occupationOfTheDay($chat_id, $date) {
 		$result = createOccupationFile ();
 	}
 	if ($result) {
-		sendNewFile ( "sendDocument", array (
+		sendFile ( "sendDocument", array (
 				'chat_id' => $chat_id,
-				'document' => new CURLFile ( $fileNamePath ) 
+				'document' => new CURLFile ( $filePath ) 
 		) );
 	} else {
 		error_log ( "Error creating file in function occupationOfTheDay" );
