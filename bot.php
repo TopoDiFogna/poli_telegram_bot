@@ -195,7 +195,7 @@ function classOccupation($chat_id, $className, $tomorrow) {
 	$year = date ( "Y" );
 	$classId = idOfGivenClassroom ( $className );
 	if ($classId != - 1) {
-		$cocckieUrl = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?evn_init=event&idaula=" . $classId . "&jaf_currentWFID=main";
+		$cookieUrl = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?evn_init=event&idaula=" . $classId . "&jaf_currentWFID=main";
 		$cookies = getCookies ( $cookieUrl );
 		$cookie = explode ( "; ", $cookies );
 		$session = substr ( $cookie [0], 1 );
