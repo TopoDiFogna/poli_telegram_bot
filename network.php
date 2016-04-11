@@ -62,6 +62,8 @@ function sendMessage($chat_id, $text, $params) {
 	execCUrlRequest ( $handle );
 }
 /**
+ * Sends a general file, can be photo, video, document ecc
+ * 
  * @param String $method the method appropriate to the file to be sent
  * @param String $file the file to be ent
  * @param array $parameters additional parameters
