@@ -202,7 +202,7 @@ function classOccupation($chat_id, $className, $tomorrow) {
 		$myfile = fopen ( $classId, "w" );
 		fwrite ( $myfile, $domOfHTML->saveHTML () );
 		fclose ( $myfile );
-		$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 /var/www/telegrambot/".$classId." /var/www/telegrambot/".$classId.".jpeg";
+		$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 --load-error-handling ignore /var/www/telegrambot/".$classId." /var/www/telegrambot/".$classId.".jpeg";
 		shell_exec ( $cmdLine );
 		$fileNamePath = realpath ( $classId . '.jpeg' );
 		sendNewFile ( "sendPhoto", array (
