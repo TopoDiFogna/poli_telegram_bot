@@ -202,9 +202,9 @@ function classOccupation($chat_id, $className, $tomorrow) {
 		$myfile = fopen ( $classId, "w" );
 		fwrite ( $myfile, $domOfHTML->saveHTML () );
 		fclose ( $myfile );
-		$cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/' . $classId . '.png /var/www/telegrambot/' . $classId;
+		$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 /var/www/telegrambot/".$classId." /var/www/telegrambot/".$classId.".jpeg";
 		shell_exec ( $cmdLine );
-		$fileNamePath = realpath ( $classId . '.png' );
+		$fileNamePath = realpath ( $classId . '.jpeg' );
 		sendNewFile ( "sendPhoto", array (
 				'chat_id' => $chat_id,
 				'photo' => new CURLFile ( $fileNamePath ) 
