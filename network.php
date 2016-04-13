@@ -62,7 +62,7 @@ function sendMessage($chat_id, $text, $params) {
 	execCUrlRequest ( $handle );
 }
 /**
- * Sends a general file, can be photo, video, document ecc
+ * Sends file
  *
  * @param String $chatId
  *        	chat it to send the message to
