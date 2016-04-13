@@ -14,6 +14,7 @@ function processMessage($message) {
 	switch ($message) {
 		case array_key_exists ( 'text', $message ) :
 			$text_message = $message ['text'];
+			$text_message = str_replace ( "@PoliMilanoBot", "", $text_message );
 			processTextMessage ( $text_message, $chat_id, $message_id );
 			break;
 		case array_key_exists ( 'audio', $message ) :
@@ -159,12 +160,14 @@ function occupationOfTheDay($chat_id, $date) {
 		$result = createOccupationFile ();
 	}
 	if ($result) {
-		sendFile ( "sendDocument", array (
-				'chat_id' => $chat_id,
-				'document' => new CURLFile ( $filePath ) 
+		$send_result = sendFile ( $chatId, $filePath, array (
+				"caption" => "Occupation of " . date ( "l d-F" ) 
 		) );
 	} else {
 		error_log ( "Error creating file in function occupationOfTheDay" );
+	}
+	if ($send_result === false) {
+		error_log ( "Error while sending the file" . $filePath );
 	}
 	// $cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
 	// shell_exec ( $cmdLine );
@@ -299,11 +302,10 @@ function extractClassName($page) {
 	// $class=$nodes[1][1];
 	// return $classText;
 }
-function classFree($chat_id, $startTime, $endTime, $tomorrow) {
+/* function classFree($chat_id, $startTime, $endTime, $tomorrow) */
+function classFree($chat_id, $startTime, $endTime, $time) {
+	$date = strtotime ( $time );
 	$day = date ( 'j' );
-	if ($tomorrow) {
-		$day = $day + 1;
-	}
 	$month = date ( 'n' );
 	$year = date ( 'Y' );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
@@ -398,29 +400,29 @@ function postHTMLCurlResponse($url, $params, $cookieString) {
 	curl_close ( $ch );
 	return $content;
 }
+/**
+ * Request a page and saves all the cookies in a file named cookies.tx in
+ * netscape format
+ *
+ * @param String $url
+ *        	the url to make the GET request
+ */
 function getCookies($url) {
-	// open a site with cookies
 	$ch = curl_init ();
-	curl_setopt ( $ch, CURLOPT_URL, $url );
-	curl_setopt ( $ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0' );
-	curl_setopt ( $ch, CURLOPT_HEADER, 1 );
-	curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
-	curl_setopt ( $ch, CURLOPT_FOLLOWLOCATION, 1 );
-	curl_setopt ( $ch, CURLOPT_SSL_VERIFYPEER, 0 );
-	curl_setopt ( $ch, CURLOPT_COOKIEJAR, 'cookie.txt' );
-	$content = curl_exec ( $ch );
+	$options = array (
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_HEADER => false,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
+			CURLOPT_AUTOREFERER => true,
+			CURLOPT_ENCODING => "",
+			CURLOPT_CONNECTTIMEOUT => 120,
+			CURLOPT_TIMEOUT => 120,
+			CURLOPT_COOKIEJAR => dirname ( __FILE__ ) . "/cookie.txt" 
+	);
 	
-	// get cookies
-	$cookies = array ();
-	preg_match_all ( '/Set-Cookie:(?<cookie>\s{0,}.*)$/im', $content, $cookies );
-	
-	print_r ( $cookies ['cookie'] ); // show harvested cookies
-	$cookieString = $cookies ['cookie'] [0];
-	return $cookieString;
-	// basic parsing of cookie strings (just an example)
-	// $cookieParts = array();
-	// preg_match_all('/Set-Cookie:\s{0,}(?P<name>[^=]*)=(?P<value>[^;]*).*?expires=(?P<expires>[^;]*).*?path=(?P<path>[^;]*).*?domain=(?P<domain>[^\s;]*).*?$/im', $content, $cookieParts);
-	// print_r($cookieParts);
+	$response = cUrlGetRequest ( $url, $options );
 }
 function multipart_build_query($fields, $boundary) {
 	$retval = '';

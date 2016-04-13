@@ -63,41 +63,36 @@ function sendMessage($chat_id, $text, $params) {
 }
 /**
  * Sends a general file, can be photo, video, document ecc
- * 
- * @param String $method the method appropriate to the file to be sent
- * @param String $file the file to be ent
- * @param array $parameters additional parameters
- * @return boolean|boolean|mixed
+ *
+ * @param String $chatId
+ *        	chat it to send the message to
+ * @param String $filePath
+ *        	the file path to be sent or the corresponding file_id
+ * @param array $parameters
+ *        	additional parameters
+ * @return boolean false if an error occurred, true otherwise
  */
-function sendFile($method, $file, $parameters) {
-	if (! is_string ( $method )) {
-		error_log("Method in sendFile name must be a string");
+function sendFile($chatId, $filePath, $parameters) {
+	if (! is_array ( $parameters )) {
+		error_log ( "Parameters must be an array in sendFile method" );
 		return false;
 	}
 	
-	if (! $parameters) {
-		$parameters = array ();
-	} else if (! is_array ( $parameters )) {
-		error_log("Parameters must be an array in sendFile method");
-		return false;
-	}
-	
-	$parameters ["method"] = $method;
-	
+	$file=new CURLFile($filePath);
 	$handle = curl_init ();
 	curl_setopt ( $handle, CURLOPT_URL, API_URL );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
-	curl_setopt ( $handle, CURLOPT_POSTFIELDS, $parameters );
+	curl_setopt($handle, CURLOPT_POSTFIELDS, $file);
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
 			"Content-Type:multipart/form-data" 
 	) );
-	$response=execCUrlRequest ( $handle );
+	$response = execCUrlRequest ( $handle );
 	if ($response === false) {
 		return false;
 	}
-	return true;
+	return response;
 }
 /**
  * Makes a cUrl request by a GET method
