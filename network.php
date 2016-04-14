@@ -101,7 +101,7 @@ function sendFile($chatId, $filePath, $parameters) {
  *        	the array containing curl opts
  * @return the response of the GET request
  */
-function cUrlGetRequest($url, $params) {
+function cUrlRequest($url, $params) {
 	$ch = curl_init ( $url );
 	curl_setopt_array ( $ch, $params );
 	$response = execCUrlRequest ( $ch );

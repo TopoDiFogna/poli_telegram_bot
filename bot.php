@@ -66,54 +66,16 @@ function processTextMessage($text, $chat_id, $message_id) {
 			}
 			break;
 		case "/free" :
-			switch (count ( $command )) {
-				case 1 :
-					sendMessage ( $chat_id, "Devi passare anche i due orari su cui eseguire la richiesta", array (
-							"reply_to_message_id" => $message_id 
-					) );
-					break;
-				case 2 :
-					sendMessage ( $chat_id, "Manca un orario", array (
-							"reply_to_message_id" => $message_id 
-					) );
-					break;
-				case 3 :
-					if ($command [1] > $command [2]) {
-						sendMessage ( $chat_id, "Il primo orario deve essere inferiore rispetto al secondo orario", array (
-								"reply_to_message_id" => $message_id 
-						) );
-						break;
-					} else {
-						classFree ( $chat_id, $command [1], $command [2], false );
-						break;
-					}
+			if (count ( $command ) < 3) {
+				$file = fopen ( "./responses/free.txt", "r" );
+				$response = fread ( $file, filesize ( $file ) );
+				fclose ( $file );
+				sendMessage ( $chat_id, $response, array (
+						'parse_mode' => 'Markdown' 
+				) );
+			} else {
+				classFree ( $chat_id, $command [1], $command [2], $command [3] );
 			}
-			;
-			break;
-		case "/freed" :
-			switch (count ( $command )) {
-				case 1 :
-					sendMessage ( $chat_id, "Devi passare anche i due orari su cui eseguire la richiesta", array (
-							"reply_to_message_id" => $message_id 
-					) );
-					break;
-				case 2 :
-					sendMessage ( $chat_id, "Manca un orario", array (
-							"reply_to_message_id" => $message_id 
-					) );
-					break;
-				case 3 :
-					if ($command [1] > $command [2]) {
-						sendMessage ( $chat_id, "Il primo orario deve essere inferiore rispetto al secondo orario", array (
-								"reply_to_message_id" => $message_id 
-						) );
-						break;
-					} else {
-						classFree ( $chat_id, $command [1], $command [2], true );
-						break;
-					}
-			}
-			;
 			break;
 		default :
 			sendMessage ( $chat_id, "Cool", array (
@@ -132,7 +94,7 @@ function processTextMessage($text, $chat_id, $message_id) {
  *        	message to send the reply to
  */
 function startFunction($chat_id, $message_id) {
-	$filePath = "./spazi/start.txt";
+	$filePath = "./responses/start.txt";
 	$file = fopen ( $filePath, "r" );
 	$response = fread ( $file, filesize ( $filePath ) );
 	fclose ( $file );
@@ -193,11 +155,10 @@ function createOccupationFile($time) {
 			CURLOPT_CONNECTTIMEOUT => 120,
 			CURLOPT_TIMEOUT => 120 
 	);
-	$result = cUrlGetRequest ( $url, $options );
-	echo ($url);
+	$result = cUrlRequest ( $url, $options );
 	
 	if ($result == false) {
-		error_log ( "Error calling cUrlGetRequest from createOccupationFile function" );
+		error_log ( "Error calling cUrlRequest from createOccupationFile function" );
 		return false;
 	}
 	
@@ -291,25 +252,21 @@ function classOccupation($chat_id, $className, $tomorrow) {
 	} else
 		sendMessage ( $chat_id, "La classe non esiste", array () );
 }
-function extractClassName($page) {
-	$dom = new DOMDocument ();
-	$internalErrors = libxml_use_internal_errors ( true );
-	$dom->loadHTML ( $page );
-	$finder = new DomXPath ( $dom );
-	$classname = "TestoSX Dati1";
-	$nodes = $finder->query ( "//td[contains(@class, '$classname')]" );
-	error_log ( var_dump ( $nodes ) );
-	// $class=$nodes[1][1];
-	// return $classText;
-}
-/* function classFree($chat_id, $startTime, $endTime, $tomorrow) */
+/**
+ * Creates the list of flee class in a given day
+ *
+ * @param int $chat_id
+ *        	the chat id to send the message to
+ * @param String $startTime
+ *        	the time used as a start time for the search
+ * @param String $endTime
+ *        	the time used as an end time for the search
+ * @param String $time
+ *        	the date used to make the search
+ */
 function classFree($chat_id, $startTime, $endTime, $time) {
 	$date = strtotime ( $time );
-	$day = date ( 'j' );
-	$month = date ( 'n' );
-	$year = date ( 'Y' );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
-	$urlCookies = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAula.do?evn_ricerca_aule_libere=evento&jaf_currentWFID=main";
 	$param = array (
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___postBack' => 'true',
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___formMode' => 'FILTER',
@@ -318,9 +275,9 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___sede' => 'MIA',
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___iddipScelto' => 'tutti',
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___sigla' => '',
-			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_day' => $day,
-			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_month' => $month,
-			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_year' => $year,
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_day' => date ( "j", $date ),
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_month' => date ( "n", $date ),
+			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_year' => date ( "Y", $date ),
 			'jaf_spazi___model___formbean___RicercaAvanzataAuleLibereVO___giorno_date_format' => 'dd/MM/yyyy',
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___orario_dal' => $startTime,
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___orario_al' => $endTime,
@@ -328,13 +285,28 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___soloPreseDiRete_default' => 'N',
 			'evn_ricerca_avanzata' => 'Ricerca aule libere' 
 	);
-	$boundary = "---------------------------41989678077857697020580537542";
+	$boundary = "----WebKitFormBoundary6baWbSkLbdhksRAi";
 	$query = multipart_build_query ( $param, $boundary );
-	$cookies = getCookies ( $urlCookies );
-	$cookie = explode ( "; ", $cookies );
-	$session = substr ( $cookie [0], 1 );
-	$session = "_ga=GA1.2.112926790.1459958705; " . $session;
-	$result = postHTMLCurlResponse ( $url, $query, $session );
+	$options = array (
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
+			CURLOPT_AUTOREFERER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_CONNECTTIMEOUT => 120,
+			CURLOPT_TIMEOUT => 120,
+			CURLOPT_POSTFIELDS => $query,
+			CURLOPT_POST => true,
+			CURLOPT_HTTPHEADER => array (
+					"Content-Type: multipart/form-data; boundary=" . $boundary,
+					"Content-Length: " . strlen ( $query ) 
+			)
+			 
+	);
+	$result = cUrlRequest ( $url, $options );
+	
+	// Create the document with only the needed table
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
 	$dom->loadHTML ( $result );
@@ -345,6 +317,8 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 	$finder = new DomXPath ( $newdom );
 	$nodes = $finder->query ( '//tbody[@class="TableDati-tbody"]' );
 	$node = $nodes->item ( 0 );
+	
+	// extract the list of available classroom
 	$answer = "";
 	if ($node->hasChildNodes ()) {
 		$parents = $node->childNodes;
@@ -367,39 +341,12 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 			}
 		}
 	}
+	var_dump ( $answer );
 	sendMessage ( $chat_id, $answer, array (
 			'parse_mode' => 'Markdown' 
 	) );
 }
-function postHTMLCurlResponse($url, $params, $cookieString) {
-	$options = array (
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
-			CURLOPT_AUTOREFERER => true,
-			CURLOPT_ENCODING => '',
-			CURLOPT_CONNECTTIMEOUT => 120,
-			CURLOPT_TIMEOUT => 120,
-			CURLOPT_POSTFIELDS => $params,
-			CURLOPT_POST => true,
-			CURLOPT_HTTPHEADER => array (
-					"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-					"Accept-Language: en-US,en;q=0.5",
-					"Accept-Encoding: gzip, deflate, br",
-					"Cookie: " . $cookieString,
-					"Connection : keep-alive",
-					"Cache-Control: max-age=0",
-					"Content-Type: multipart/form-data; boundary=---------------------------41989678077857697020580537542",
-					"Content-Length: " . strlen ( $params ) 
-			) 
-	);
-	$ch = curl_init ( $url );
-	curl_setopt_array ( $ch, $options );
-	$content = curl_exec ( $ch );
-	curl_close ( $ch );
-	return $content;
-}
+
 /**
  * Request a page and saves all the cookies in a file named cookies.tx in
  * netscape format
@@ -422,8 +369,17 @@ function getCookies($url) {
 			CURLOPT_COOKIEJAR => dirname ( __FILE__ ) . "/cookie.txt" 
 	);
 	
-	$response = cUrlGetRequest ( $url, $options );
+	$response = cUrlRequest ( $url, $options );
 }
+/**
+ * Builds a POST query used to make a POST
+ *
+ * @param array $fields
+ *        	all the params of the query
+ * @param String $boundary
+ *        	boundary to separate query fields
+ * @return string the complete POST request
+ */
 function multipart_build_query($fields, $boundary) {
 	$retval = '';
 	foreach ( $fields as $key => $value ) {
