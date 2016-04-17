@@ -64,7 +64,7 @@ function sendMessage($chat_id, $text, $params) {
 /**
  * Sends file
  *
- * @param String $chatId
+ * @param int $chatId
  *        	chat it to send the message to
  * @param String $filePath
  *        	the file path to be sent or the corresponding file_id
@@ -72,21 +72,59 @@ function sendMessage($chat_id, $text, $params) {
  *        	additional parameters
  * @return boolean false if an error occurred, true otherwise
  */
-function sendFile($chatId, $filePath, $parameters) {
+function sendFile($chatId, $filePath, $params) {
 	if (! is_array ( $parameters )) {
 		error_log ( "Parameters must be an array in sendFile method" );
 		return false;
 	}
 	
-	$file=new CURLFile($filePath);
+	$file = new CURLFile ( $filePath );
+	$params ["method"] = "sendDocument";
+	$params ["chat_id"] = $chatId;
+	$params ["document"] = $file;
 	$handle = curl_init ();
 	curl_setopt ( $handle, CURLOPT_URL, API_URL );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
-	curl_setopt($handle, CURLOPT_POSTFIELDS, $file);
+	curl_setopt ( $handle, CURLOPT_POSTFIELDS, json_encode ( $params ) );
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
-			"Content-Type:multipart/form-data" 
+			"Content-Type: multipart/form-data" 
+	) );
+	$response = execCUrlRequest ( $handle );
+	if ($response === false) {
+		return false;
+	}
+	return response;
+}
+/**
+ * Sends compressed photo
+ *
+ * @param int $chatId
+ *        	chat it to send the message to
+ * @param String $filePath
+ *        	the file path to be sent or the corresponding file_id
+ * @param array $parameters
+ *        	additional parameters
+ * @return boolean false if an error occurred, true otherwise
+ */
+function sendPhoto($chatId, $filePath, $params) {
+	if (! is_array ( $parameters )) {
+		error_log ( "Parameters must be an array in sendFile method" );
+		return false;
+	}
+	$file = new CURLFile ( $filePath );
+	$params ["method"] = "sendDocument";
+	$params ["chat_id"] = $chatId;
+	$params ["photo"] = $file;
+	$handle = curl_init ();
+	curl_setopt ( $handle, CURLOPT_URL, API_URL );
+	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
+	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
+	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
+	curl_setopt ( $handle, CURLOPT_POSTFIELDS, json_encode ( $params ) );
+	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
+			"Content-Type: multipart/form-data" 
 	) );
 	$response = execCUrlRequest ( $handle );
 	if ($response === false) {

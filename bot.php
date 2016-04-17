@@ -131,8 +131,6 @@ function occupationOfTheDay($chat_id, $date) {
 	if ($send_result === false) {
 		error_log ( "Error while sending the file" . $filePath );
 	}
-	// $cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/occupation.png /var/www/telegrambot/occupation.html';
-	// shell_exec ( $cmdLine );
 }
 /**
  * Creates the HTML file with the occupation for the specified date
@@ -169,36 +167,6 @@ function createOccupationFile($time) {
 	fclose ( $file );
 	return true;
 }
-function getHTMLCurlResponse($url, $cookie) {
-	/*
-	 * $options = array (
-	 * CURLOPT_RETURNTRANSFER => true,
-	 * CURLOPT_HEADER => false,
-	 * CURLOPT_FOLLOWLOCATION => true,
-	 * CURLOPT_MAXREDIRS => 10,
-	 * CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
-	 * CURLOPT_AUTOREFERER => true,
-	 * CURLOPT_ENCODING => "",
-	 * CURLOPT_CONNECTTIMEOUT => 120,
-	 * CURLOPT_TIMEOUT => 120
-	 * );
-	 *
-	 * $ch = curl_init ( $url );
-	 * curl_setopt_array ( $ch, $options );
-	 */
-	if (strlen ( $cookie ) > 0) {
-		curl_setopt ( $ch, CURL_HTTPHEADER, array (
-				"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-				"Accept-Language: en-US,en;q=0.5",
-				"Accept-Encoding: gzip, deflate, br",
-				"Cookie: " . $cookie,
-				"Connection : keep-alive" 
-		) );
-	}
-	$content = curl_exec ( $ch );
-	curl_close ( $ch );
-	return $content;
-}
 /**
  * Creates DOM document compiled with html and CSS
  *
@@ -226,34 +194,49 @@ function getDOMFromHTMLIdWithCSS($page, $idToSelect, $cssFilePath) {
 	libxml_use_internal_errors ( $internalErrors ); // restore normal logging method
 	return $newDomWithSelectedId;
 }
-function classOccupation($chat_id, $className, $tomorrow) {
-	$day = date ( "j" );
-	$month = date ( "n" );
-	$year = date ( "Y" );
+/**
+ * Creates and send an image of the occupation for the requested classroom
+ *
+ * @param int $chat_id
+ *        	chat id to send the message to
+ * @param String $className
+ *        	name of the requested classroom
+ * @param String $date
+ *        	date for the requested occupation
+ */
+function classOccupation($chat_id, $className, $date) {
+	$time = strtotime ( $date );
 	$classId = idOfGivenClassroom ( $className );
 	if ($classId != - 1) {
 		$cookieUrl = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?evn_init=event&idaula=" . $classId . "&jaf_currentWFID=main";
-		$cookies = getCookies ( $cookieUrl );
-		$cookie = explode ( "; ", $cookies );
-		$session = substr ( $cookie [0], 1 );
-		$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?idaula=" . $classId . "&fromData_day=" . $day . "&fromData_month=" . $month . "&fromData_year=" . $year . "&jaf_fromData_date_format=dd%2FMM%2Fyyyy&toData_day=" . $day . "&toData_month=" . $month . "&toData_year=" . $year . "&jaf_toData_date_format=dd%2FMM%2Fyyyy&evn_occupazioni=Visualizza+occupazioni";
-		$response = getHTMLCurlResponse ( $url, $cookie );
-		$dom = getDOMFromHTMLIDWithCSS ( $response, 'tableContainer', "spazi/table-MOZ.css" );
-		$myfile = fopen ( $classId, "w" );
+		getCookies ( $cookieUrl );
+		$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?idaula=" . $classId . "&fromData_day=" . date ( "j", $time ) . "&fromData_month=" . date ( "n", $time ) . "&fromData_year=" . date ( "Y", $time ) . "&jaf_fromData_date_format=dd%2FMM%2Fyyyy&toData_day=" . date ( "j", $time ) . "&toData_month=" . date ( "n", $time ) . "&toData_year=" . date ( "Y", $time ) . "&jaf_toData_date_format=dd%2FMM%2Fyyyy&evn_occupazioni=Visualizza+occupazioni";
+		$options = array (
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_HEADER => false,
+				CURLOPT_FOLLOWLOCATION => true,
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
+				CURLOPT_AUTOREFERER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_CONNECTTIMEOUT => 120,
+				CURLOPT_TIMEOUT => 120,
+				CURLOPT_COOKIEFILE => realpath ( "cookie.txt" ) 
+		);
+		$response = cUrlRequest ( $url, $options );
+		$domOfHTML = getDOMFromHTMLIDWithCSS ( $response, 'tableContainer', "spazi/table-MOZ.css" );
+		$myfile = fopen ( $classId . ".html", "w" );
 		fwrite ( $myfile, $domOfHTML->saveHTML () );
 		fclose ( $myfile );
-		$cmdLine = 'xvfb-run --server-args="-screen 0, 1024x768x24" /var/www/telegrambot/webkit2png.py -o /var/www/telegrambot/' . $classId . '.png /var/www/telegrambot/' . $classId;
+		$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 --load-error-handling ignore /var/www/telegrambot/" . $classId . ".html /var/www/telegrambot/" . $classId . ".jpeg";
 		shell_exec ( $cmdLine );
-		$fileNamePath = realpath ( $classId . '.png' );
-		sendNewFile ( "sendPhoto", array (
-				'chat_id' => $chat_id,
-				'document' => new CURLFile ( $fileNamePath ) 
-		) );
+		$filePath = realpath ( $classId . '.jpeg' );
+		sendPhoto ( $chat_id, $filePath, array ());
 	} else
 		sendMessage ( $chat_id, "La classe non esiste", array () );
 }
 /**
- * Creates the list of flee class in a given day
+ * Creates the list of free class in a given day
  *
  * @param int $chat_id
  *        	the chat id to send the message to
@@ -301,8 +284,7 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 			CURLOPT_HTTPHEADER => array (
 					"Content-Type: multipart/form-data; boundary=" . $boundary,
 					"Content-Length: " . strlen ( $query ) 
-			)
-			 
+			) 
 	);
 	$result = cUrlRequest ( $url, $options );
 	
@@ -366,7 +348,7 @@ function getCookies($url) {
 			CURLOPT_ENCODING => "",
 			CURLOPT_CONNECTTIMEOUT => 120,
 			CURLOPT_TIMEOUT => 120,
-			CURLOPT_COOKIEJAR => dirname ( __FILE__ ) . "/cookie.txt" 
+			CURLOPT_COOKIEJAR => realpath ( "cookie.txt" ) 
 	);
 	
 	$response = cUrlRequest ( $url, $options );
