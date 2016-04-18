@@ -119,8 +119,8 @@ function sendFile($chatId, $filePath, $params) {
  * @return boolean false if an error occurred, true otherwise
  */
 function sendPhoto($chatId, $filePath, $params) {
-	if (! is_array ( $parameters )) {
-		error_log ( "Parameters must be an array in sendFile method" );
+	if (! is_array ( $params )) {
+		error_log ( "Parameters must be an array in sendPhoto method" );
 		return false;
 	}
 	$file = new CURLFile (  realpath($filePath) );

@@ -347,6 +347,7 @@ function classFree($chat_id, $startTime, $endTime, $time) {
  *        	the url to make the GET request
  */
 function getCookies($url) {
+	shell_exec("touch cookie.txt");
 	$ch = curl_init ();
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
