@@ -122,7 +122,7 @@ function startFunction($chat_id, $message_id) {
  *        	the date of the day to retrieve the occupation
  */
 function occupationOfTheDay($chat_id, $date) {
-	$filePath = "./files/occupation.html";
+	$filePath = "files/occupation.html";
 	
 	$result=true;
 	if (! file_exists ( $filePath )) {
@@ -172,7 +172,7 @@ function createOccupationFile($time) {
 	
 	$domOfHTML = getDOMFromHTMLIdWithCSS ( $result, 'tableContainer', "spazi/table-MOZ.css" );
 	
-	$file = fopen ( "./files/occupation.html", "w" );
+	$file = fopen ( "files/occupation.html", "w" );
 	fwrite ( $file, $domOfHTML->saveHTML () );
 	fclose ( $file );
 	return true;
