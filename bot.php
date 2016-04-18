@@ -120,11 +120,11 @@ function occupationOfTheDay($chat_id, $date) {
 	$filePath = "./files/occupation.html";
 	
 	if (! file_exists ( $filePath )) {
-		$result = createOccupationFile ();
+		$result = createOccupationFile ($date);
 	}
 	
 	if (time () - filemtime ( $filePath ) > 3600 * 2) {
-		$result = createOccupationFile ();
+		$result = createOccupationFile ($date);
 	}
 	if ($result) {
 		$send_result = sendFile ( $chatId, $filePath, array (

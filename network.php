@@ -41,6 +41,16 @@ function execCUrlRequest($handle) {
 	}
 	return $response;
 }
+/**
+ * Send a message
+ * 
+ * @param int $chatId
+ *        	chat it to send the message to
+ * @param String $text
+ *        	the text message to be sent
+ * @param array $parameters
+ *        	additional parameters
+ */
 function sendMessage($chat_id, $text, $params) {
 	if (! $params) {
 		$params = array ();
