@@ -67,7 +67,12 @@ function processTextMessage($text, $chat_id, $message_id) {
 						"reply_to_message_id" => $message_id 
 				) );
 			} else {
-				classOccupation ( $chat_id, $command [1], true );
+				if(isset($command[2])){
+					classOccupation ( $chat_id, $command [1], $command[2] );
+				}
+				else{
+					classOccupation ( $chat_id, $command [1], date("j")."-".date("n")."-".date("Y"));
+				}
 			}
 			break;
 		case "/free" :
