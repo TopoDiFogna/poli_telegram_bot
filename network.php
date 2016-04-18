@@ -4,16 +4,21 @@ define ( 'BOT_TOKEN', '142518261:AAGi48H9GL-oQxw_cQFVmwFnPVT6KBVFty0' );
 
 // url to query the bot
 define ( 'API_URL', 'https://api.telegram.org/bot' . BOT_TOKEN . '/' );
-function exec_curl_request($handle) {
-	
-	// response to save response from telegram servers
+
+/**
+ * Makes a cUrl request
+ *
+ * @param cUrlHandle $handle
+ *        	the handle to the cUrl request
+ * @return boolean|mixed false if cUrl got some error, mixed otherwise
+ */
+function execCUrlRequest($handle) {
 	$response = curl_exec ( $handle );
-	
 	// if we get an error
 	if ($response === false) {
+		
 		$errno = curl_errno ( $handle );
 		$error = curl_error ( $handle );
-		error_log ( "Curl returned error $errno: $error\n" );
 		curl_close ( $handle );
 		return false;
 	}
@@ -22,32 +27,30 @@ function exec_curl_request($handle) {
 	curl_close ( $handle );
 	
 	if ($http_code >= 500) { // internal server error
-	                         // do not wat to DDOS server if something goes wrong
-		sleep ( 10 );
 		return false;
 	} else if ($http_code != 200) { // we have an error //200=ok code
 		
 		$response = json_decode ( $response, true );
-		error_log ( "Request has failed with error {$response['error_code']}: {$response['description']}\n" );
+		error_log ( "Request has failed with error " . $http_code );
 		
 		if ($http_code == 401) { // 401=unauthorized access
-			throw new Exception ( 'Invalid access token provided' );
+			error_log ( "Invalid access token provided" );
 		}
 		
 		return false;
-	} else {
-		// no error, so we parse the response
-		$response = json_decode ( $response, true );
-		
-		if (isset ( $response ['description'] )) {
-			
-			error_log ( "Request was successfull: {$response['description']}\n" );
-		}
-		
-		$response = $response ['result'];
 	}
 	return $response;
 }
+/**
+ * Send a message
+ * 
+ * @param int $chatId
+ *        	chat it to send the message to
+ * @param String $text
+ *        	the text message to be sent
+ * @param array $parameters
+ *        	additional parameters
+ */
 function sendMessage($chat_id, $text, $params) {
 	if (! $params) {
 		$params = array ();
@@ -66,60 +69,90 @@ function sendMessage($chat_id, $text, $params) {
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
 			"Content-Type: application/json" 
 	) );
-	exec_curl_request ( $handle );
+	execCUrlRequest ( $handle );
 }
-function apiRequestJson($method, $parameters) {
-	if (! is_string ( $method )) {
-		echo ("Method name must be a string\n");
+/**
+ * Sends file
+ *
+ * @param int $chatId
+ *        	chat it to send the message to
+ * @param String $filePath
+ *        	the file path to be sent or the corresponding file_id
+ * @param array $parameters
+ *        	additional parameters
+ * @return boolean false if an error occurred, true otherwise
+ */
+function sendFile($chatId, $filePath, $params) {
+	if (! is_array ( $params )) {
+		error_log ( "Parameters must be an array in sendFile method" );
 		return false;
 	}
 	
-	if (! $parameters) {
-		$parameters = array ();
-	} else if (! is_array ( $parameters )) {
-		
-		echo ("Parameters must be an array\n");
-		
-		return false;
-	}
-	
-	$parameters ["method"] = $method;
-	
-	$handle = curl_init ();
-	curl_setopt ( $handle, CURLOPT_URL, API_URL );
-	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
-	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
-	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
-	curl_setopt ( $handle, CURLOPT_POSTFIELDS, json_encode ( $parameters ) );
-	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
-			"Content-Type: application/json" 
-	) );
-	return exec_curl_request ( $handle );
-}
-function sendNewFile($method, $parameters) {
-	if (! is_string ( $method )) {
-		echo ("Method name must be a string\n");
-		return false;
-	}
-	
-	if (! $parameters) {
-		$parameters = array ();
-	} else if (! is_array ( $parameters )) {
-		echo ("Parameters must be an array\n");
-		return false;
-	}
-	
-	$parameters ["method"] = $method;
-	
+	$file = new CURLFile ( realpath($filePath) );
+	$params ["method"] = "sendDocument";
+	$params ["chat_id"] = $chatId;
+	$params ["document"] = $file;
 	$handle = curl_init ();
 	curl_setopt ( $handle, CURLOPT_URL, API_URL );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
-	curl_setopt ( $handle, CURLOPT_POSTFIELDS, $parameters);
+	curl_setopt ( $handle, CURLOPT_POSTFIELDS, $params );
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
-			"Content-Type:multipart/form-data"
+			"Content-Type: multipart/form-data" 
 	) );
-	return exec_curl_request ( $handle );
+	$response = execCUrlRequest ( $handle );
+	if ($response === false) {
+		return false;
+	}
+	return $response;
+}
+/**
+ * Sends compressed photo
+ *
+ * @param int $chatId
+ *        	chat it to send the message to
+ * @param String $filePath
+ *        	the file path to be sent or the corresponding file_id
+ * @param array $parameters
+ *        	additional parameters
+ * @return boolean false if an error occurred, true otherwise
+ */
+function sendPhoto($chatId, $filePath, $params) {
+	if (! is_array ( $params )) {
+		error_log ( "Parameters must be an array in sendPhoto method" );
+		return false;
+	}
+	$file = new CURLFile ($filePath);
+	$params ["method"] = "sendPhoto";
+	$params ["chat_id"] = $chatId;
+	$params ["photo"] = $file;
+	$handle = curl_init ();
+	curl_setopt ( $handle, CURLOPT_URL, API_URL );
+	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
+	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
+	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
+	curl_setopt ( $handle, CURLOPT_POSTFIELDS,  $params);
+	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
+			"Content-Type: multipart/form-data" 
+	) );
+	$response = execCUrlRequest ( $handle );
+	if ($response === false) {
+		return false;
+	}
+	return response;
+}
+/**
+ * Makes a cUrl request by a GET method
+ *
+ * @param array $params
+ *        	the array containing curl opts
+ * @return the response of the GET request
+ */
+function cUrlRequest($url, $params) {
+	$ch = curl_init ( $url );
+	curl_setopt_array ( $ch, $params );
+	$response = execCUrlRequest ( $ch );
+	return $response;
 }
 ?>
