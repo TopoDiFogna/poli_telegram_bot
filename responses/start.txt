@@ -4,7 +4,7 @@ Hi !! I'm the *PolimiBot* and I can help you to easily find a classroom for stud
 I'm in the first official release, so I support only Leonardo classrooms.
 
 *Here there is the lists of my commands:*
-```1. /occupation `[dd-mm-yyy]` 
+1. /occupation `[dd-mm-yyy]` 
     I will give you a HTML file concerning the occupation status of all polimi Leonardo classrooms of the selected day.
     If you don't pass me anything I will give you the today occupation status.
     (Don't worry about the strange name of the file, it's safe ;) )
@@ -16,7 +16,7 @@ I'm in the first official release, so I support only Leonardo classrooms.
     If you don't pass me the date I will give the today occupation status.
     The class name must respect the Polimi standard ex: N.0.2, L26.1.3,D.2.1
 4. /help 
-    I will send you the commands list.```
+    I will send you the commands list.
 
 All the content enclosed by `[]` is optional.
 
