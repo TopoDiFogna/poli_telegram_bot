@@ -88,7 +88,7 @@ function sendFile($chatId, $filePath, $params) {
 		return false;
 	}
 	
-	$file = new CURLFile ( $filePath );
+	$file = new CURLFile ( realpath($filePath) );
 	$params ["method"] = "sendDocument";
 	$params ["chat_id"] = $chatId;
 	$params ["document"] = $file;
