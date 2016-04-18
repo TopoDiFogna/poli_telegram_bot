@@ -8,7 +8,7 @@ I'm in the first official release, so I support only Leonardo classrooms.
     I will give you a HTML file concerning the occupation status of all polimi Leonardo classrooms of the selected day.
     If you don't pass me anything I will give you the today occupation status.
     (Don't worry about the strange name of the file, it's safe ;) )
-2. /free hh:mm hh:mm `[dd-mm-yyyy]` 
+2. /free `hh:mm hh:mm [dd-mm-yyyy]` 
     I will send you the list of free classrooms from the first time passed to the second one, in the given day.
     If you don't pass me the date I will give the today list.
 3. /classroom className `[dd-mm-yyyy]` 
