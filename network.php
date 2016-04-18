@@ -83,7 +83,7 @@ function sendMessage($chat_id, $text, $params) {
  * @return boolean false if an error occurred, true otherwise
  */
 function sendFile($chatId, $filePath, $params) {
-	if (! is_array ( $parameters )) {
+	if (! is_array ( $params )) {
 		error_log ( "Parameters must be an array in sendFile method" );
 		return false;
 	}

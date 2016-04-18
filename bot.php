@@ -127,7 +127,7 @@ function occupationOfTheDay($chat_id, $date) {
 		$result = createOccupationFile ($date);
 	}
 	if ($result) {
-		$send_result = sendFile ( $chatId, $filePath, array (
+		$send_result = sendFile ( $chat_id, $filePath, array (
 				"caption" => "Occupation of " . date ( "l d-F" ) 
 		) );
 	} else {
