@@ -56,11 +56,9 @@ function processTextMessage($text, $chat_id, $message_id) {
 		case "/occupation" :
 			if(isset($command[1])){
 				occupationOfTheDay ( $chat_id, $command [1] );
-				error_log($command[1]);
 			}
 			else{
 				occupationOfTheDay ( $chat_id, date("j")."-".date("n")."-".date("Y"));
-				error_log("oggi");
 			}
 			break;
 		case "/classroom" :
@@ -123,9 +121,9 @@ function startFunction($chat_id, $message_id) {
  * @param String $date
  *        	the date of the day to retrieve the occupation
  */
-function occupationOfTheDay($chat_id, $date) {
-	$filePath = "files/occupation.html";
-	
+function occupationOfTheDay($chat_id, $time) {
+	$date = strtotime ( $time );
+	$filePath = "files/occupation".$date.".html";
 	$result=true;
 	if (! file_exists ( $filePath )) {
 		$result = createOccupationFile ($date);
@@ -135,7 +133,7 @@ function occupationOfTheDay($chat_id, $date) {
 	}
 	if ($result) {
 		$result = sendFile ( $chat_id, $filePath, array (
-				"caption" => "Occupation of " . date ( "l d-F" ) 
+				"caption" => "Occupation of " . date ( "l d-F",$date ) 
 		) );
 	} else {
 		error_log ( "Error creating file in function occupationOfTheDay" );
@@ -151,8 +149,7 @@ function occupationOfTheDay($chat_id, $date) {
  *        	the day to create the file
  * @return false if an error occours creating the file otherwise returns true
  */
-function createOccupationFile($time) {
-	$date = strtotime ( $time );
+function createOccupationFile($date) {
 	$url = 'https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=' . date ( "j", $date ) . '&giorno_month=' . date ( "n", $date ) . '&giorno_year=' . date ( "Y", $date ) . '&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
@@ -177,6 +174,7 @@ function createOccupationFile($time) {
 	$file = fopen ( "files/occupation.html", "w" );
 	fwrite ( $file, $domOfHTML->saveHTML () );
 	fclose ( $file );
+	error_log("file creato ".$date);
 	return true;
 }
 /**
