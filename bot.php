@@ -51,6 +51,9 @@ function processTextMessage($text, $chat_id, $message_id) {
 		case "/start" :
 			startFunction ( $chat_id, $message_id );
 			break;
+		case "/help" :
+			startFunction ( $chat_id, $message_id );
+			break;
 		case "/stop" :
 			break;
 		case "/occupation" :
