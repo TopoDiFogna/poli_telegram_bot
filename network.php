@@ -105,7 +105,7 @@ function sendFile($chatId, $filePath, $params) {
 	if ($response === false) {
 		return false;
 	}
-	return response;
+	return $response;
 }
 /**
  * Sends compressed photo
