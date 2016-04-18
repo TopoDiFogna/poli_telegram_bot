@@ -126,10 +126,10 @@ function occupationOfTheDay($chat_id, $time) {
 	$filePath = "files/occupation".$date.".html";
 	$result=true;
 	if (! file_exists ( $filePath )) {
-		$result = createOccupationFile ($date);
+		$result = createOccupationFile ($date,$filePath);
 	}
 	if (time () - filemtime ( $filePath ) > 3600 * 2) {
-		$result = createOccupationFile ($date);
+		$result = createOccupationFile ($date,$filePath);
 	}
 	if ($result) {
 		$result = sendFile ( $chat_id, $filePath, array (
@@ -149,7 +149,7 @@ function occupationOfTheDay($chat_id, $time) {
  *        	the day to create the file
  * @return false if an error occours creating the file otherwise returns true
  */
-function createOccupationFile($date) {
+function createOccupationFile($date,$file_path) {
 	$url = 'https://www7.ceda.polimi.it/spazi/spazi/controller/OccupazioniGiornoEsatto.do?csic=MIA&categoria=D&tipologia=tutte&giorno_day=' . date ( "j", $date ) . '&giorno_month=' . date ( "n", $date ) . '&giorno_year=' . date ( "Y", $date ) . '&jaf_giorno_date_format=dd%2FMM%2Fyyyy&evn_visualizza=Visualizza+occupazioni';
 	$options = array (
 			CURLOPT_RETURNTRANSFER => true,
@@ -171,7 +171,7 @@ function createOccupationFile($date) {
 	
 	$domOfHTML = getDOMFromHTMLIdWithCSS ( $result, 'tableContainer', "spazi/table-MOZ.css" );
 	
-	$file = fopen ( "files/occupation.html", "w" );
+	$file = fopen ( $file_path, "w" );
 	fwrite ( $file, $domOfHTML->saveHTML () );
 	fclose ( $file );
 	error_log("file creato ".$date);
