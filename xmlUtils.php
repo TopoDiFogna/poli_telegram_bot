@@ -14,7 +14,9 @@ function idOfGivenClassroom($className) {
 		$xml = new Domxpath ( $xmldoc );
 		$items = $xml->query ( "//classroom[name='$className']/id" );
 		if ($items->length == 1) {
-			return $items->item ( 0 )->nodeValue;
+			$returnValue=$items->item ( 0 )->nodeValue;
+			$returnValue=rtrim($returnValue, "\n");
+			return $returnValue;
 		} else {
 			return - 1;
 		}
