@@ -92,7 +92,7 @@ function sendFile($chatId, $filePath, $params) {
 	error_log ( "CURLFile created".realpath($filePath) );
 	$params ["method"] = "sendDocument";
 	$params ["chat_id"] = $chatId;
-	$params ["document"] = $file;
+	$params ["document"] = new CURLFile ( realpath($filePath) );
 	$handle = curl_init ();
 	curl_setopt ( $handle, CURLOPT_URL, API_URL );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
