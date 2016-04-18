@@ -240,7 +240,7 @@ function classOccupation($chat_id, $className, $date) {
 		fclose ( $myfile );
 		$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 --load-error-handling ignore /var/www/telegrambot/files/" . $classId . ".html /var/www/telegrambot/files/" . $classId . ".jpeg";
 		shell_exec ( $cmdLine );
-		$filePath = realpath ( $classId . '.jpeg' );
+		$filePath = realpath ( "files/".$classId . '.jpeg' );
 		sendPhoto ( $chat_id, $filePath, array () );
 	} else
 		sendMessage ( $chat_id, "La classe non esiste", array () );
