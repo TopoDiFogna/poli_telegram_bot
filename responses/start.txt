@@ -1,18 +1,23 @@
-Hi !! I'm the **PolimiBot** and I can help you to easily find a classroom for studying.
+Hi !! I'm the *PolimiBot* and I can help you to easily find a classroom for studying.
 (or whatever you want to do in a Polimi Classroom)
 
 I'm in the first official release, so I support only Leonardo classrooms.
 
 *Here there is the lists of my commands:*
-1. /occupation [dd-mm-yyy] I will give you a HTML file concerning the occupation status of all polimi Leonardo classrooms of the selected day.
-						   If you don't pass me anything I will give you the today occupation status.
-2. /free hh:mm hh:mm [dd-mm-yyyy] I will send you the list of free classrooms from the first time passed to the second one, in the given day.
-								  If you don't pass me the date I will give the today list.
-3. /classroom className [dd-mm-yyyy] I will send you the photo of the given classroom occupation status in the selected day.
-									 If you don't pass me the date I will give the today occupation status.
-									 The class name must respect the Polimi standard ex: N.0.2, L26.1.3,D.2.1
-4. /help I will send you the commands list.
-All the content enclosed by [] is optional.
++ /occupation `[dd-mm-yyy]` 
+	I will give you a HTML file concerning the occupation status of all polimi Leonardo classrooms of the selected day.
+	If you don't pass me anything I will give you the today occupation status.
+	(Don't worry about the strange name of the file, it's safe ;) )
++ /free hh:mm hh:mm `[dd-mm-yyyy]` 
+	I will send you the list of free classrooms from the first time passed to the second one, in the given day.
+	If you don't pass me the date I will give the today list.
++ /classroom className `[dd-mm-yyyy]` 
+	I will send you the photo of the given classroom occupation status in the selected day.
+	If you don't pass me the date I will give the today occupation status.
+	The class name must respect the Polimi standard ex: N.0.2, L26.1.3,D.2.1
+4. /help 
+	I will send you the commands list.
+All the content enclosed by `[]` is optional.
 
 I Hope I will be Useful !!
 RM
