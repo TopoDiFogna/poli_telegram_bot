@@ -123,8 +123,8 @@ function sendPhoto($chatId, $filePath, $params) {
 		error_log ( "Parameters must be an array in sendPhoto method" );
 		return false;
 	}
-	$file = new CURLFile (  realpath($filePath) );
-	$params ["method"] = "sendDocument";
+	$file = new CURLFile (realpath($filePath));
+	$params ["method"] = "sendPhoto";
 	$params ["chat_id"] = $chatId;
 	$params ["photo"] = $file;
 	$handle = curl_init ();
