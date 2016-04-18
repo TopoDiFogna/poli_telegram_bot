@@ -132,13 +132,13 @@ function occupationOfTheDay($chat_id, $date) {
 		$result = createOccupationFile ($date);
 	}
 	if ($result) {
-		$send_result = sendFile ( $chat_id, $filePath, array (
+		$result = sendFile ( $chat_id, $filePath, array (
 				"caption" => "Occupation of " . date ( "l d-F" ) 
 		) );
 	} else {
 		error_log ( "Error creating file in function occupationOfTheDay" );
 	}
-	if ($send_result === false) {
+	if ($result === false) {
 		error_log ( "Error while sending the file" . $filePath );
 	}
 }
