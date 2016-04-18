@@ -192,9 +192,7 @@ function getDOMFromHTMLIdWithCSS($page, $idToSelect, $cssFilePath) {
 	$dom = new DOMDocument (); // creates a new dom document
 	$internalErrors = libxml_use_internal_errors ( true ); // to avoid logging warning for malformed HTML pages
 	$dom->loadHTML ( $page ); // transform HTML to dom file
-	error_log($idToSelect);
 	$domElement = $dom->getElementById ( $idToSelect );
-	error_log(var_dump($domElement));
 	$newDomWithSelectedId = new DOMDocument ();
 	$cloned = $domElement->cloneNode ( TRUE );
 	$styleFile = fopen ( $cssFilePath, "r" );
