@@ -56,9 +56,11 @@ function processTextMessage($text, $chat_id, $message_id) {
 		case "/occupation" :
 			if(isset($command[1])){
 				occupationOfTheDay ( $chat_id, $command [1] );
+				error_log($command[1]);
 			}
 			else{
 				occupationOfTheDay ( $chat_id, date("j")."-".date("n")."-".date("Y"));
+				error_log("oggi");
 			}
 			break;
 		case "/classroom" :
