@@ -65,7 +65,7 @@ function processTextMessage($text, $chat_id, $message_id) {
 			break;
 		case "/classroom" :
 			if (! isset ( $command [1] )) {
-				sendMessage ( $chat_id, "Stronzo mi devi dire un'aula", array (
+				sendMessage ( $chat_id, "You must give me a Class !!!!!!", array (
 						"reply_to_message_id" => $message_id 
 				) );
 			} else {
@@ -84,15 +84,14 @@ function processTextMessage($text, $chat_id, $message_id) {
 				sendMessage ( $chat_id, $response, array (
 						'parse_mode' => 'Markdown' 
 				) );
-			}else if(isset($command[3])){
+			} else if (isset ( $command [3] )) {
 				classFree ( $chat_id, $command [1], $command [2], $command [3] );
-			}
-			else{
+			} else {
 				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 			}
 			break;
 		default :
-			sendMessage ( $chat_id, "Cool", array (
+			sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
 					"reply_to_message_id" => $message_id 
 			) );
 			break;
@@ -126,7 +125,7 @@ function startFunction($chat_id, $message_id) {
  *        	the date of the day to retrieve the occupation
  */
 function occupationOfTheDay($chat_id, $time) {
-	$time=fixDayString($time);
+	$time = fixDayString ( $time );
 	$date = strtotime ( $time );
 	$filePath = "files/occupation" . $date . ".html";
 	$result = true;
@@ -141,9 +140,11 @@ function occupationOfTheDay($chat_id, $time) {
 				"caption" => "Occupation of " . date ( "l d-F", $date ) 
 		) );
 	} else {
+		sendMessage ( $chat_id, "I've encountered a error in the Polimi Server. It's not my fault ;)", array () );
 		error_log ( "Error creating file in function occupationOfTheDay" );
 	}
 	if ($result === false) {
+		sendMessage ( $chat_id, "I've encountered some troubles in sending you the HTML file, I'm Sorry !!", array () );
 		error_log ( "Error while sending the file" . $filePath );
 	}
 }
@@ -219,7 +220,7 @@ function getDOMFromHTMLIdWithCSS($page, $idToSelect, $cssFilePath) {
  *        	date for the requested occupation
  */
 function classOccupation($chat_id, $className, $date) {
-	$date=fixDayString($date);
+	$date = fixDayString ( $date );
 	$time = strtotime ( $date );
 	$classId = idOfGivenClassroom ( $className );
 	if ($classId != - 1) {
@@ -239,16 +240,23 @@ function classOccupation($chat_id, $className, $date) {
 				CURLOPT_COOKIEFILE => realpath ( "cookie.txt" ) 
 		);
 		$response = cUrlRequest ( $url, $options );
-		$domOfHTML = getDOMFromHTMLIDWithCSS ( $response, 'tableContainer', "spazi/table-MOZ.css" );
-		$myfile = fopen ( "./files/" . $classId . ".html", "w" );
-		fwrite ( $myfile, $domOfHTML->saveHTML () );
-		fclose ( $myfile );
-		$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 --load-error-handling ignore /var/www/telegrambot/files/" . $classId . ".html /var/www/telegrambot/files/" . $classId . ".jpeg";
-		shell_exec ( $cmdLine );
-		$filePath = realpath ( "files/" . $classId . '.jpeg' );
-		sendPhoto ( $chat_id, $filePath, array () );
+		if ($response == false) {
+			sendMessage ( $chat_id, "I've encountered a error in the Polimi Server. It's not my fault ;)", array () );
+		} else {
+			$domOfHTML = getDOMFromHTMLIDWithCSS ( $response, 'tableContainer', "spazi/table-MOZ.css" );
+			$myfile = fopen ( "./files/" . $classId . ".html", "w" );
+			fwrite ( $myfile, $domOfHTML->saveHTML () );
+			fclose ( $myfile );
+			$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 --load-error-handling ignore /var/www/telegrambot/files/" . $classId . ".html /var/www/telegrambot/files/" . $classId . ".jpeg";
+			shell_exec ( $cmdLine );
+			$filePath = realpath ( "files/" . $classId . '.jpeg' );
+			$photoResponse=sendPhoto ( $chat_id, $filePath, array () );
+			if($photoResponse === false){
+				error_log("Error in sending Photo");
+			}
+		}
 	} else
-		sendMessage ( $chat_id, "La classe non esiste", array () );
+		sendMessage ( $chat_id, "The given classroom not exits or doesn't match the Polimi Standard: ex D.2.1,L.26.13,N.0.2", array () );
 }
 /**
  * Creates the list of free class in a given day
@@ -263,7 +271,7 @@ function classOccupation($chat_id, $className, $date) {
  *        	the date used to make the search
  */
 function classFree($chat_id, $startTime, $endTime, $time) {
-	$time=fixDayString($time);
+	$time = fixDayString ( $time );
 	$date = strtotime ( $time );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
 	$param = array (
@@ -389,13 +397,13 @@ function multipart_build_query($fields, $boundary) {
 
 /**
  * This function returns the Date String passed in the right format dd-mm-yyyy
- * 
- * @param unknown $unfixedDate
+ *
+ * @param unknown $unfixedDate        	
  * @return mixed
  */
-function fixDayString($unfixedDate){
-	$newString= str_replace ( "/", "-", $unfixedDate );
-	$newString= str_replace ( ".", "-", $newString );
+function fixDayString($unfixedDate) {
+	$newString = str_replace ( "/", "-", $unfixedDate );
+	$newString = str_replace ( ".", "-", $newString );
 	return $newString;
 }
 ?>
