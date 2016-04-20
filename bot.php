@@ -84,8 +84,11 @@ function processTextMessage($text, $chat_id, $message_id) {
 				sendMessage ( $chat_id, $response, array (
 						'parse_mode' => 'Markdown' 
 				) );
-			} else {
+			}else if(isset($command[3])){
 				classFree ( $chat_id, $command [1], $command [2], $command [3] );
+			}
+			else{
+				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 			}
 			break;
 		default :
@@ -123,6 +126,7 @@ function startFunction($chat_id, $message_id) {
  *        	the date of the day to retrieve the occupation
  */
 function occupationOfTheDay($chat_id, $time) {
+	$time=fixDayString($time);
 	$date = strtotime ( $time );
 	$filePath = "files/occupation" . $date . ".html";
 	$result = true;
@@ -379,5 +383,17 @@ function multipart_build_query($fields, $boundary) {
 	}
 	$retval .= "--$boundary--";
 	return $retval;
+}
+
+/**
+ * This function returns the Date String passed in the right format dd-mm-yyyy
+ * 
+ * @param unknown $unfixedDate
+ * @return mixed
+ */
+function fixDayString($unfixedDate){
+	$newString= str_replace ( "/", "-", $unfixedDate );
+	$newString= str_replace ( ".", "-", $newString );
+	return $newString;
 }
 ?>

@@ -1,1 +1,1 @@
-free placeholder
+You must pass me at least 2 time slots in this format hh:mm 
