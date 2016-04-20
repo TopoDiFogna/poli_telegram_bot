@@ -3,7 +3,7 @@ Hi !! I'm the *PolimiBot* and I can help you to easily find a classroom for stud
 
 I'm in the first official release, so I support only Leonardo classrooms.
 
-*Here there is the lists of my commands:*
+*Here there is the list of my commands:*
 1. /occupation `[dd-mm-yyy]` 
     I will give you a HTML file concerning the occupation status of all polimi Leonardo classrooms of the selected day.
     If you don't pass me anything I will give you the today occupation status.

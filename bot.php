@@ -219,6 +219,7 @@ function getDOMFromHTMLIdWithCSS($page, $idToSelect, $cssFilePath) {
  *        	date for the requested occupation
  */
 function classOccupation($chat_id, $className, $date) {
+	$date=fixDayString($date);
 	$time = strtotime ( $date );
 	$classId = idOfGivenClassroom ( $className );
 	if ($classId != - 1) {
@@ -262,6 +263,7 @@ function classOccupation($chat_id, $className, $date) {
  *        	the date used to make the search
  */
 function classFree($chat_id, $startTime, $endTime, $time) {
+	$time=fixDayString($time);
 	$date = strtotime ( $time );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
 	$param = array (
