@@ -90,6 +90,8 @@ function processTextMessage($text, $chat_id, $message_id) {
 				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 			}
 			break;
+		case "/freek":
+			break;
 		default :
 			sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
 					"reply_to_message_id" => $message_id 
