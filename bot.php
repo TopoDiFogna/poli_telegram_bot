@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Process the incoming message
  * 
@@ -7,7 +6,7 @@
  */
 function processMessage($message) {
 	$message_id = $message ['message_id']; // used in replies
-	
+	$response_id; //TODO cercare sulle API telegram la sintassi
 	$chat_id = $message ['chat'] ['id']; // chat to send the message to
 	                                     
 	// checks what type of message is incoming and perform the correct operation
@@ -77,7 +76,10 @@ function processTextMessage($text, $chat_id, $message_id) {
 			}
 			break;
 		case "/free" :
-			if (count ( $command ) < 3) {
+			if(count($command)==1){
+				//TODO chiamare la funzione che fa il controllo
+			}
+			if (count ( $command ) < 3 && count($command)>1) {
 				$file = fopen ( "./responses/free.txt", "r" );
 				$response = fread ( $file, filesize ( $file ) );
 				fclose ( $file );
@@ -90,9 +92,8 @@ function processTextMessage($text, $chat_id, $message_id) {
 				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 			}
 			break;
-		case "/freek":
-			break;
 		default :
+			//TODO chiamare funzione per parsare le risposte senza lo /
 			sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
 					"reply_to_message_id" => $message_id 
 			) );
@@ -408,4 +409,7 @@ function fixDayString($unfixedDate) {
 	$newString = str_replace ( ".", "-", $newString );
 	return $newString;
 }
+
+//TODO fare la nuova funzione per la keyboard
+//TODO fare la nuova funzione per il parsing dei messaggi senza /
 ?>
