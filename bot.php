@@ -6,15 +6,18 @@
  */
 function processMessage($message) {
 	$message_id = $message ['message_id']; // used in replies
-	$response_id; //TODO cercare sulle API telegram la sintassi
-	$chat_id = $message ['chat'] ['id']; // chat to send the message to
+	$chat_id = $message ['chat'] ['id'];
+	$response_id=0;// chat to send the message to
+	if(isset($message['reply_to_message'])){
+		$response_id=$message['reply_to_message']['message_id'];
+	}
 	                                     
 	// checks what type of message is incoming and perform the correct operation
 	switch ($message) {
 		case array_key_exists ( 'text', $message ) :
 			$text_message = $message ['text'];
 			$text_message = str_replace ( "@PoliMilanoBot", "", $text_message );
-			processTextMessage ( $text_message, $chat_id, $message_id );
+			processTextMessage ( $text_message, $chat_id, $message_id,$response_id);
 			break;
 		case array_key_exists ( 'audio', $message ) :
 			break;
@@ -44,7 +47,7 @@ function processMessage($message) {
  * @param int $message_id
  *        	the id of the message to reply to
  */
-function processTextMessage($text, $chat_id, $message_id) {
+function processTextMessage($text, $chat_id, $message_id,$response_id) {
 	$command = explode ( " ", $text );
 	switch ($command [0]) {
 		case "/start" :
@@ -410,6 +413,9 @@ function fixDayString($unfixedDate) {
 	return $newString;
 }
 
+function startNewFreeChat($chat_id,$message_id){
+	//TODO finire funzione per l'invio della prima keyboard
+}
 //TODO fare la nuova funzione per la keyboard
 //TODO fare la nuova funzione per il parsing dei messaggi senza /
 ?>
