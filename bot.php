@@ -415,6 +415,22 @@ function fixDayString($unfixedDate) {
 
 function startNewFreeChat($chat_id,$message_id){
 	//TODO finire funzione per l'invio della prima keyboard
+	$objArray=retriveObject();
+	foreach ($objArray as $obj){
+		//TODO finire la funzione
+	}
+}
+
+function retriveObject(){
+	$myfile=fopen("object.txt", "r");
+	$allObj=fread($myfile, filesize($myfile));
+	$objArraySer=explode("$$$", $allObj);
+	$objArray= array();
+	foreach ($objArraySer as $objSer){
+		$obj=unserialize($objSer);
+		array_push($objArray, $obj);
+	}
+	return $objArray;
 }
 //TODO fare la nuova funzione per la keyboard
 //TODO fare la nuova funzione per il parsing dei messaggi senza /
