@@ -80,10 +80,10 @@ function processTextMessage($text, $chat_id, $message_id,$response_id) {
 			break;
 		case "/free" :
 			if(count($command)==1){
-				//TODO chiamare la funzione che fa il controllo
+				startNewFreeChat($chat_id, $message_id);
 			}
 			if (count ( $command ) < 3 && count($command)>1) {
-				$file = fopen ( "./responses/free.txt", "r" );
+				$file = fopen ( "responses/free.txt", "r" );
 				$response = fread ( $file, filesize ( $file ) );
 				fclose ( $file );
 				sendMessage ( $chat_id, $response, array (
@@ -413,25 +413,33 @@ function fixDayString($unfixedDate) {
 	return $newString;
 }
 
+/**
+ * This function send to the $chat_id and $message_id the first keyboard in order to start the the new command free 
+ * with keyboard
+ * 
+ * @param unknown $chat_id
+ * @param unknown $message_id
+ */
 function startNewFreeChat($chat_id,$message_id){
-	//TODO finire funzione per l'invio della prima keyboard
-	$objArray=retriveObject();
-	foreach ($objArray as $obj){
-		//TODO finire la funzione
-	}
+	$objArray=retriveObject("objects.txt");
+	$parameters= array (
+			"chat_id" -> $chat_id,
+	);
+	$newObj= new objectFree($parameters);
+	$messageSent=sendMessage($chat_id, "Please Select the start Time Hour", array(
+			"reply_to_message_id" -> $message_id,
+			"reply_markup"-> array(
+					"keyboard" -> getArrayForKeyboard("responses/hours.txt"),
+					"one_time_keyboard" -> true,
+					"selextive" -> true )
+	));
+	$newMessageId=$messageSent["message_id"];
+	$newObj->setMessage_id($newMessageId);
+	array_push($objArray, $newObj);
+	serializeObject($objArray, "objects.txt");
 }
 
-function retriveObject(){
-	$myfile=fopen("object.txt", "r");
-	$allObj=fread($myfile, filesize($myfile));
-	$objArraySer=explode("$$$", $allObj);
-	$objArray= array();
-	foreach ($objArraySer as $objSer){
-		$obj=unserialize($objSer);
-		array_push($objArray, $obj);
-	}
-	return $objArray;
+function parseFreeMessage($chat_id,$message_id,$replay_message,$text){
+	//TODO fare la nuova funzione per il parsing dei messaggi senza /	
 }
-//TODO fare la nuova funzione per la keyboard
-//TODO fare la nuova funzione per il parsing dei messaggi senza /
 ?>
