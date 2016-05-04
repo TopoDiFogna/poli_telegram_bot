@@ -97,6 +97,7 @@ function processTextMessage($text, $chat_id, $message_id,$response_id) {
 			break;
 		default :
 			//TODO chiamare funzione per parsare le risposte senza lo /
+			//TODO fare controllo se il messaggio è o meno una risposta
 			sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
 					"reply_to_message_id" => $message_id 
 			) );
@@ -440,6 +441,8 @@ function startNewFreeChat($chat_id,$message_id){
 }
 
 function parseFreeMessage($chat_id,$message_id,$replay_message,$text){
-	//TODO fare la nuova funzione per il parsing dei messaggi senza /	
+	//TODO fare la nuova funzione per il parsing dei messaggi senza /
+	//TODO fare il check se il messaggio se ho già u oggetto con quell replay, se si allora aggiungere il parametro e nel caso concludere la funzione
+	//TODO se non ha il replay allora ritornare false, così posso rispondere con il messaggio di default
 }
 ?>
