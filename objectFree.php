@@ -1,0 +1,84 @@
+<?php
+class freeObj {
+	public $message_id;
+	public $chat_id;
+	public $startTimeH;
+	public $startTimeM;
+	public $endTimeH;
+	public $endTimeM;
+	public $day;
+	public function __construct($properties) {
+		if (is_array ( $properties )) {
+			if (isset ( $properties ["message_id"] )) {
+				$this->message_id = $properties ["message_id"];
+			}
+			if (isset ( $properties ["chat_id"] )) {
+				$this->chat_id = $properties ["chat_id"];
+			}
+			if (isset ( $properties ["startTimeH"] )) {
+				$this->startTimeH = $properties ["startTimeH"];
+			}
+			if (isset ( $properties ["startTimeM"] )) {
+				$this->startTimeH = $properties ["startTimeM"];
+			}
+			if (isset ( $properties ["endTimeH"] )) {
+				$this->endTimeH = $properties ["endTimeH"];
+			}
+			if (isset ( $properties ["endTimeM"] )) {
+				$this->endTimeH = $properties ["endTimeM"];
+			}
+			if (isset ( $properties ["day"] )) {
+				$this->day = $properties ["day"];
+			}
+		}
+	}
+	public function addProperty($newProperty) {
+		if (isset ( $this->startTimeH )) {
+			if (isset ( $this->endTimeM )) {
+				if (isset ( $this->endTimeH )) {
+					if (isset ( $this->endTimeM )) {
+						if (! isset ( $this->day )) {
+							$this->day = $newProperty;
+							return true;
+						}
+					} else {
+						$this->endTimeM = $newProperty;
+						return "day";
+					}
+				} else {
+					$this->endTimeH = $newProperty;
+					return "minutes";
+				}
+			} else {
+				$this->startTimeM = $newProperty;
+				return "hours";
+			}
+		} else {
+			$this->startTimeH = $newProperty;
+			return "minutes";
+		}
+	}
+	public function setMessage_id($new_id) {
+		$this->message_id = $new_id;
+	}
+	public function getMessage_id($new_id) {
+		if (isset ( $this->message_id )) {
+			$this->message_id = $new_id;
+		} else {
+			return false;
+		}
+	}
+	public function executeCommandFree() {
+		$deltahour = $this->startTimeH - $this->endTimeH;
+		if ($deltahour > 0) {
+			return classFree ( $this->chat_id, $this->startTimeH.":".$this->startTimeM, $this->endTimeH.":".$this->endTimeM, $this->day );
+		} elseif ($deltahour == 0) {
+			$deltaMinutes = $this->startTimeM - $this->endTimeM;
+			if ($deltaMinutes >= 0) {
+				return classFree ( $this->chat_id, $this->startTimeH.":".$this->startTimeM, $this->endTimeH.":".$this->endTimeM, $this->day );
+			}
+		}
+		return false;
+	}
+}
+?>
