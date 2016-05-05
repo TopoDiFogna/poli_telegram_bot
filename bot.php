@@ -92,7 +92,7 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 				) );
 			} else if (isset ( $command [3] )) {
 				classFree ( $chat_id, $command [1], $command [2], $command [3] );
-			} else {
+			} else if (count($command)==3){
 				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 			}
 			break;

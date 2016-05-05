@@ -29,7 +29,7 @@ function retriveObject($filePath) {
  */
 function getArrayForKeyboard($filePath) {
 	$myfile = fopen ( $filePath, "r" );
-	$readString = fread ( $myfile, filesize ( $myfile ) );
+	$readString = fread ( $myfile, filesize ( $filePath ) );
 	fclose($myfile);
 	$arrayString = explode ( " ", $readString );
 	return $arrayString;

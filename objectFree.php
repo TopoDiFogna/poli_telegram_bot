@@ -38,7 +38,14 @@ class freeObj {
 				if (isset ( $this->endTimeH )) {
 					if (isset ( $this->endTimeM )) {
 						if (! isset ( $this->day )) {
-							$this->day = $newProperty;
+							if($newProperty=="Today"){
+								$this->day = date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" );
+							}else{
+								$datetime = new DateTime(date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ));
+								$datetime->modify('+1 day');
+								$this->day=$datetime;
+							}
+							
 							return true;
 						}
 					} else {
