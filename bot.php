@@ -79,6 +79,7 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 			}
 			break;
 		case "/free" :
+			error_log("--------------------------------------------------------------".PHP_EOL);
 			if (count ( $command ) == 1) {
 				startNewFreeChat ( $chat_id, $message_id );
 			}
