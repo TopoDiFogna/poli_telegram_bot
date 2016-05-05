@@ -8,7 +8,7 @@
  */
 function retriveObject($filePath) {
 	$myfile = fopen ( $filePath, "r" );
-	error_log($myfile);
+	error_log(var_dump($myfile));
 	if (filesize ( $myfile ) == 0) {
 		return array ();
 	} else {
