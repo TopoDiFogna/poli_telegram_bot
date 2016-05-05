@@ -85,7 +85,7 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 			}
 			if (count ( $command ) < 3 && count ( $command ) > 1) {
 				$file = fopen ( "responses/free.txt", "r" );
-				$response = fread ( $file, filesize ( $file ) );
+				$response = fread ( $file, filesize ( "responses/free.txt" ) );
 				fclose ( $file );
 				sendMessage ( $chat_id, $response, array (
 						'parse_mode' => 'Markdown' 
