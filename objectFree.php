@@ -68,7 +68,7 @@ class freeObj {
 	public function setMessage_id($new_id) {
 		$this->message_id = $new_id;
 	}
-	public function getMessage_id($new_id) {
+	public function getMessage_id() {
 		if (isset ( $this->message_id )) {
 			$this->message_id = $new_id;
 		} else {
