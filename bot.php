@@ -428,7 +428,7 @@ function startNewFreeChat($chat_id, $message_id) {
 	$parameters = array (
 			"chat_id" => $chat_id 
 	);
-	$newObj = new objectFree ( $parameters );
+	$newObj = new freeObj( $parameters );
 	$messageSent = sendMessage ( $chat_id, "Please Select the start Time Hour", array (
 			"reply_to_message_id" => $message_id,
 			"reply_markup" => array (
