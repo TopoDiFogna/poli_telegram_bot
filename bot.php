@@ -430,7 +430,7 @@ function startNewFreeChat($chat_id, $message_id) {
 			"chat_id" => $chat_id 
 	);
 	$newObj = new freeObj( $parameters );
-	$messageSent = sendMessage ( $chat_id, "Please Select the start Time Hour", array (
+	$messageSent = sendMessage ( $chat_id, "Please Select the startTime Hour", array (
 			"reply_to_message_id" => $message_id,
 			"reply_markup" => array (
 					"keyboard" => getArrayForKeyboard ( "responses/hours.txt" ),

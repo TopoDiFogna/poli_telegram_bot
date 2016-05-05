@@ -32,9 +32,6 @@ function getArrayForKeyboard($filePath) {
 	$readString = fread ( $myfile, filesize ( $filePath ) );
 	fclose($myfile);
 	$arrayString = explode ( " ", $readString );
-	foreach ($arrayString as $string){
-		error_log($string.PHP_EOL);
-	}
 	return $arrayString;
 }
 
