@@ -14,7 +14,9 @@ function retriveObject($filePath) {
 		$allObj = fread ( $myfile, filesize ( $filePath ) );
 		$objArraySer = explode ( "$$$", $allObj );
 		$objArray = array ();
-		error_log($objArraySer);
+		foreach ($objArraySer as $string){
+			error_log($string);
+		}
 		foreach ( $objArraySer as $objSer ) {
 			$obj = unserialize ( $objSer );
 			array_push ( $objArray, $obj );
