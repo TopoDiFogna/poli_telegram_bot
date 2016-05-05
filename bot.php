@@ -433,7 +433,7 @@ function startNewFreeChat($chat_id, $message_id) {
 	$messageSent = sendMessage ( $chat_id, "Please Select the startTime Hour", array (
 			"reply_to_message_id" => $message_id,
 			"reply_markup" => array (
-					"keyboard" => getArrayForKeyboard ( "responses/hours.txt" ),
+					"keyboard" => array(getArrayForKeyboard ( "responses/hours.txt" )),
 					"one_time_keyboard" => true,
 					"selextive" => true 
 			) 
@@ -474,7 +474,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 				$messageSent = sendMessage ( $chat_id, "Please Select the " . $returnValue, array (
 						"reply_to_message_id" => $message_id,
 						"reply_markup" => array (
-								"keyboard" => getArrayForKeyboard ( $keyboard ),
+								"keyboard" => array(getArrayForKeyboard ( $keyboard )),
 								"one_time_keyboard" => true,
 								"selextive" => true 
 						) 
