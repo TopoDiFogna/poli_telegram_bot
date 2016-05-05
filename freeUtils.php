@@ -8,11 +8,10 @@
  */
 function retriveObject($filePath) {
 	$myfile = fopen ( $filePath, "r" );
-	error_log(var_dump($myfile));
-	if (filesize ( $myfile ) == 0) {
+	if (filesize ( $filePath ) == 0) {
 		return array ();
 	} else {
-		$allObj = fread ( $myfile, filesize ( $myfile ) );
+		$allObj = fread ( $myfile, filesize ( $filePath ) );
 		$objArraySer = explode ( "$$$", $allObj );
 		$objArray = array ();
 		foreach ( $objArraySer as $objSer ) {
