@@ -43,19 +43,19 @@ class freeObj {
 						}
 					} else {
 						$this->endTimeM = $newProperty;
-						return "day";
+						return "Selected day";
 					}
 				} else {
 					$this->endTimeH = $newProperty;
-					return "minutes";
+					return "EndTime minutes";
 				}
 			} else {
 				$this->startTimeM = $newProperty;
-				return "hours";
+				return "EndTime hours";
 			}
 		} else {
 			$this->startTimeH = $newProperty;
-			return "minutes";
+			return "StartTime minutes";
 		}
 	}
 	public function setMessage_id($new_id) {

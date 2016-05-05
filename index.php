@@ -2,6 +2,8 @@
 include_once 'network.php';
 include_once 'bot.php';
 include_once 'xmlUtils.php';
+include_once 'freeUtils.php';
+include_once 'objectFree.php';
 
 //reads the data from the request
 $content = file_get_contents("php://input");
