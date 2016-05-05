@@ -96,9 +96,9 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 			}
 			break;
 		default :
-			if ($response_id !== 0){
-				parseFreeMessage($chat_id, $message_id, $response_id, $command[0]);
-			}else{
+			if ($response_id !== 0) {
+				parseFreeMessage ( $chat_id, $message_id, $response_id, $command [0] );
+			} else {
 				sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
 						"reply_to_message_id" => $message_id 
 				) );
@@ -426,12 +426,16 @@ function fixDayString($unfixedDate) {
 function startNewFreeChat($chat_id, $message_id) {
 	$objArray = retriveObject ( "objects.txt" );
 	$parameters = array (
-			"chat_id"->$chat_id 
+			"chat_id" => $chat_id 
 	);
 	$newObj = new objectFree ( $parameters );
 	$messageSent = sendMessage ( $chat_id, "Please Select the start Time Hour", array (
-			"reply_to_message_id"->$message_id,
-			"reply_markup"->array ( "keyboard"->getArrayForKeyboard ( "responses/hours.txt" ), "one_time_keyboard"->true, "selextive"->true ) 
+			"reply_to_message_id" => $message_id,
+			"reply_markup" => array (
+					"keyboard" => getArrayForKeyboard ( "responses/hours.txt" ),
+					"one_time_keyboard" => true,
+					"selextive" => true 
+			) 
 	) );
 	$newMessageId = $messageSent ["message_id"];
 	$newObj->setMessage_id ( $newMessageId );
@@ -467,8 +471,12 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 				$stringResult = explode ( $returnValue, " " );
 				$keyboard = "responses/" . $stringResult [1] . ".txt";
 				$messageSent = sendMessage ( $chat_id, "Please Select the " . $returnValue, array (
-						"reply_to_message_id"->$message_id,
-						"reply_markup"->array ( "keyboard"->getArrayForKeyboard ( $keyboard ), "one_time_keyboard"->true, "selextive"->true ) 
+						"reply_to_message_id" => $message_id,
+						"reply_markup" => array (
+								"keyboard" => getArrayForKeyboard ( $keyboard ),
+								"one_time_keyboard" => true,
+								"selextive" => true 
+						) 
 				) );
 				$newMessageId = $messageSent ["message_id"];
 				$obj->setMessage_id ( $newMessageId );
