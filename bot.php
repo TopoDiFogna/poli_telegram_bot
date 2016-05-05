@@ -7,17 +7,17 @@
 function processMessage($message) {
 	$message_id = $message ['message_id']; // used in replies
 	$chat_id = $message ['chat'] ['id'];
-	$response_id=0;// chat to send the message to
-	if(isset($message['reply_to_message'])){
-		$response_id=$message['reply_to_message']['message_id'];
+	$response_id = 0; // chat to send the message to
+	if (isset ( $message ['reply_to_message'] )) {
+		$response_id = $message ['reply_to_message'] ['message_id'];
 	}
-	                                     
+	
 	// checks what type of message is incoming and perform the correct operation
 	switch ($message) {
 		case array_key_exists ( 'text', $message ) :
 			$text_message = $message ['text'];
 			$text_message = str_replace ( "@PoliMilanoBot", "", $text_message );
-			processTextMessage ( $text_message, $chat_id, $message_id,$response_id);
+			processTextMessage ( $text_message, $chat_id, $message_id, $response_id );
 			break;
 		case array_key_exists ( 'audio', $message ) :
 			break;
@@ -47,7 +47,7 @@ function processMessage($message) {
  * @param int $message_id
  *        	the id of the message to reply to
  */
-function processTextMessage($text, $chat_id, $message_id,$response_id) {
+function processTextMessage($text, $chat_id, $message_id, $response_id) {
 	$command = explode ( " ", $text );
 	switch ($command [0]) {
 		case "/start" :
@@ -79,10 +79,10 @@ function processTextMessage($text, $chat_id, $message_id,$response_id) {
 			}
 			break;
 		case "/free" :
-			if(count($command)==1){
-				startNewFreeChat($chat_id, $message_id);
+			if (count ( $command ) == 1) {
+				startNewFreeChat ( $chat_id, $message_id );
 			}
-			if (count ( $command ) < 3 && count($command)>1) {
+			if (count ( $command ) < 3 && count ( $command ) > 1) {
 				$file = fopen ( "responses/free.txt", "r" );
 				$response = fread ( $file, filesize ( $file ) );
 				fclose ( $file );
@@ -96,10 +96,13 @@ function processTextMessage($text, $chat_id, $message_id,$response_id) {
 			}
 			break;
 		default :
-			//TODO chiamare funzione per parsare le risposte senza lo /
-			sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
-					"reply_to_message_id" => $message_id 
-			) );
+			if ($response_id !== 0){
+				parseFreeMessage($chat_id, $message_id, $response_id, $command[0]);
+			}else{
+				sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
+						"reply_to_message_id" => $message_id 
+				) );
+			}
 			break;
 	}
 }
@@ -256,9 +259,9 @@ function classOccupation($chat_id, $className, $date) {
 			$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 --load-error-handling ignore /var/www/telegrambot/files/" . $classId . ".html /var/www/telegrambot/files/" . $classId . ".jpeg";
 			shell_exec ( $cmdLine );
 			$filePath = realpath ( "files/" . $classId . '.jpeg' );
-			$photoResponse=sendPhoto ( $chat_id, $filePath, array () );
-			if($photoResponse === false){
-				error_log("Error in sending Photo");
+			$photoResponse = sendPhoto ( $chat_id, $filePath, array () );
+			if ($photoResponse === false) {
+				error_log ( "Error in sending Photo" );
 			}
 		}
 	} else
@@ -414,32 +417,71 @@ function fixDayString($unfixedDate) {
 }
 
 /**
- * This function send to the $chat_id and $message_id the first keyboard in order to start the the new command free 
+ * This function send to the $chat_id and $message_id the first keyboard in order to start the the new command free
  * with keyboard
- * 
- * @param unknown $chat_id
- * @param unknown $message_id
+ *
+ * @param unknown $chat_id        	
+ * @param unknown $message_id        	
  */
-function startNewFreeChat($chat_id,$message_id){
-	$objArray=retriveObject("objects.txt");
-	$parameters= array (
-			"chat_id" -> $chat_id,
+function startNewFreeChat($chat_id, $message_id) {
+	$objArray = retriveObject ( "objects.txt" );
+	$parameters = array (
+			"chat_id"->$chat_id 
 	);
-	$newObj= new objectFree($parameters);
-	$messageSent=sendMessage($chat_id, "Please Select the start Time Hour", array(
-			"reply_to_message_id" -> $message_id,
-			"reply_markup"-> array(
-					"keyboard" -> getArrayForKeyboard("responses/hours.txt"),
-					"one_time_keyboard" -> true,
-					"selextive" -> true )
-	));
-	$newMessageId=$messageSent["message_id"];
-	$newObj->setMessage_id($newMessageId);
-	array_push($objArray, $newObj);
-	serializeObject($objArray, "objects.txt");
+	$newObj = new objectFree ( $parameters );
+	$messageSent = sendMessage ( $chat_id, "Please Select the start Time Hour", array (
+			"reply_to_message_id"->$message_id,
+			"reply_markup"->array ( "keyboard"->getArrayForKeyboard ( "responses/hours.txt" ), "one_time_keyboard"->true, "selextive"->true ) 
+	) );
+	$newMessageId = $messageSent ["message_id"];
+	$newObj->setMessage_id ( $newMessageId );
+	array_push ( $objArray, $newObj );
+	serializeObject ( $objArray, "objects.txt" );
 }
 
-function parseFreeMessage($chat_id,$message_id,$replay_message,$text){
-	//TODO fare la nuova funzione per il parsing dei messaggi senza /	
+/**
+ * This function do the parsing of the message without /, if they are a response of a free keyBoard, it either send the
+ * next keybord or the list of free classrooms
+ *
+ * @param
+ *        	$chat_id
+ * @param
+ *        	$message_id
+ * @param
+ *        	$replay_message
+ * @param
+ *        	$text
+ */
+function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
+	$objArray = retriveObject ( "objects.txt" );
+	$found = false;
+	foreach ( $objArray as $key => $obj ) {
+		$idToCompare = $obj->getMessage_id ();
+		if ($idToCompare == $replay_message) {
+			$returnValue = $obj->addProperty ( $text );
+			$found = true;
+			if (is_bool ( $returnValue )) {
+				$obj->executeCommandFree ();
+				unset ( $objArray [$key] );
+			} else {
+				$stringResult = explode ( $returnValue, " " );
+				$keyboard = "responses/" . $stringResult [1] . ".txt";
+				$messageSent = sendMessage ( $chat_id, "Please Select the " . $returnValue, array (
+						"reply_to_message_id"->$message_id,
+						"reply_markup"->array ( "keyboard"->getArrayForKeyboard ( $keyboard ), "one_time_keyboard"->true, "selextive"->true ) 
+				) );
+				$newMessageId = $messageSent ["message_id"];
+				$obj->setMessage_id ( $newMessageId );
+			}
+			break;
+		}
+	}
+	if ($found) {
+		serializeObject ( $objArray, "objects.txt" );
+	} else {
+		sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
+				"reply_to_message_id" => $message_id 
+		) );
+	}
 }
 ?>
