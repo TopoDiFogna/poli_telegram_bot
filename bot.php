@@ -275,6 +275,7 @@ function classOccupation($chat_id, $className, $date) {
  *        	the date used to make the search
  */
 function classFree($chat_id, $startTime, $endTime, $time) {
+	error_log("mi hanno chiamato");
 	$time = fixDayString ( $time );
 	$date = strtotime ( $time );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
