@@ -13,6 +13,7 @@ function retriveObject($filePath) {
 	} else {
 		$allObj = fread ( $myfile, filesize ( $filePath ) );
 		$objArray = unserialize ( $allObj );
+		return $objArray;
 	}
 }
 
