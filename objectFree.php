@@ -34,7 +34,7 @@ class freeObj {
 	}
 	public function addProperty($newProperty) {
 		if (isset ( $this->startTimeH )) {
-			if (isset ( $this->endTimeM )) {
+			if (isset ( $this->startTimeM )) {
 				if (isset ( $this->endTimeH )) {
 					if (isset ( $this->endTimeM )) {
 						if (! isset ( $this->day )) {
@@ -45,7 +45,6 @@ class freeObj {
 								$datetime->modify ( '+1 day' );
 								$this->day = $datetime;
 							}
-							
 							return true;
 						}
 					} else {
