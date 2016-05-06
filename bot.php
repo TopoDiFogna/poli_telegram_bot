@@ -461,6 +461,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 		$chatToCompare = $obj->getChat_id ();
 		if (($idToCompare == $replay_message or $replay_message == - 1) and ($chatToCompare == $chat_id)) {
 			$returnValue = $obj->addProperty ( $text );
+			error_log("-------------------------------------222222222222222222222".$returnValue);
 			$found = true;
 			if (is_bool ( $returnValue )) {
 				$obj->executeCommandFree ();
