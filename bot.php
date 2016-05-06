@@ -464,8 +464,13 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 			$returnValue = $obj->addProperty ( $text );
 			$found = true;
 			if (is_bool ( $returnValue )) {
-				$obj->executeCommandFree ();
+				$result=$obj->executeCommandFree ();
 				unset ( $objArray [$key] );
+				if(!$result){
+					sendMessage ( $chat_id, "You gimme some wrong informations", array (
+							"reply_to_message_id" => $message_id
+					) );
+				}
 			} else {
 				$stringResult = explode (" ", $returnValue);
 				$keyboard = "responses/" . $stringResult [1] . ".txt";

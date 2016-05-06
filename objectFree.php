@@ -43,7 +43,7 @@ class freeObj {
 							} else {
 								$datetime = new DateTime ( date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 								$datetime->modify ( '+1 day' );
-								$this->day = $datetime;
+								$this->day = $datetime->format("d-m-Y");
 							}
 							return true;
 						}
@@ -82,18 +82,21 @@ class freeObj {
 		}
 	}
 	public function executeCommandFree() {
-		error_log("---".$this->startTimeH."----".$this->startTimeM."----".$this->endTimeH."----".$this->endTimeM."-----".$this->day);
 		$deltahour = $this->endTimeH - $this->starTimeH;
 		if ($deltahour > 0) {
-			error_log("delta hours is ok");
 			classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
+			return true;
 		} elseif ($deltahour == 0) {
-			error_log("delta minutes is not ok");
 			$deltaMinutes = $this->endTimeM - $this->startTimeM;
 			if ($deltaMinutes >= 0) {
 				classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
+				return true;
+			}
+			else{
+				return false;
 			}
 		}
+		return false;
 	}
 }
 ?>
