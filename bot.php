@@ -461,13 +461,14 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 		$chatToCompare = $obj->getChat_id ();
 		if (($idToCompare == $replay_message or $replay_message == - 1) and ($chatToCompare == $chat_id)) {
 			$returnValue = $obj->addProperty ( $text );
-			error_log("-------------------------------------222222222222222222222".$returnValue);
+			error_log("-------------------------------------222222222222222222222".$returnValue.PHP_EOL);
 			$found = true;
 			if (is_bool ( $returnValue )) {
 				$obj->executeCommandFree ();
 				unset ( $objArray [$key] );
 			} else {
 				$stringResult = explode ( $returnValue, " " );
+				error_log("-------------------------------------222222222222222222222".count($stringResult).$stringResult[0].$stringResult[1].PHP_EOL);
 				$keyboard = "responses/" . $stringResult [1] . ".txt";
 				$messageSent = sendMessage ( $chat_id, "Please Select the " . $returnValue, array (
 						"reply_to_message_id" => $message_id,
