@@ -7,7 +7,7 @@
 function processMessage($message) {
 	$message_id = $message ['message_id']; // used in replies
 	$chat_id = $message ['chat'] ['id'];
-	$response_id = 0; // chat to send the message to
+	$response_id = -1; // chat to send the message to
 	if (isset ( $message ['reply_to_message'] )) {
 		$response_id = $message ['reply_to_message'] ['message_id'];
 	}
@@ -79,7 +79,7 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 			}
 			break;
 		case "/free" :
-			error_log("--------------------------------------------------------------".PHP_EOL);
+			error_log ( "--------------------------------------------------------------" . PHP_EOL );
 			if (count ( $command ) == 1) {
 				startNewFreeChat ( $chat_id, $message_id );
 			}
@@ -92,18 +92,12 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 				) );
 			} else if (isset ( $command [3] )) {
 				classFree ( $chat_id, $command [1], $command [2], $command [3] );
-			} else if (count($command)==3){
+			} else if (count ( $command ) == 3) {
 				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 			}
 			break;
 		default :
-			if ($response_id !== 0) {
-				parseFreeMessage ( $chat_id, $message_id, $response_id, $command [0] );
-			} else {
-				sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
-						"reply_to_message_id" => $message_id 
-				) );
-			}
+			parseFreeMessage ( $chat_id, $message_id, $response_id, $command [0] );
 			break;
 	}
 }
@@ -429,11 +423,13 @@ function startNewFreeChat($chat_id, $message_id) {
 	$parameters = array (
 			"chat_id" => $chat_id 
 	);
-	$newObj = new freeObj( $parameters );
+	$newObj = new freeObj ( $parameters );
 	$messageSent = sendMessage ( $chat_id, "Please Select the startTime Hour", array (
 			"reply_to_message_id" => $message_id,
 			"reply_markup" => array (
-					"keyboard" => array(getArrayForKeyboard ( "responses/hours.txt" )),
+					"keyboard" => array (
+							getArrayForKeyboard ( "responses/hours.txt" ) 
+					),
 					"one_time_keyboard" => true,
 					"selextive" => true 
 			) 
@@ -462,7 +458,8 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 	$found = false;
 	foreach ( $objArray as $key => $obj ) {
 		$idToCompare = $obj->getMessage_id ();
-		if ($idToCompare == $replay_message) {
+		$chatToCompare = $obj->getChat_id ();
+		if (($idToCompare == $replay_message or $replay_message == - 1) and ($chatToCompare == $chat_id)) {
 			$returnValue = $obj->addProperty ( $text );
 			$found = true;
 			if (is_bool ( $returnValue )) {
@@ -474,7 +471,9 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 				$messageSent = sendMessage ( $chat_id, "Please Select the " . $returnValue, array (
 						"reply_to_message_id" => $message_id,
 						"reply_markup" => array (
-								"keyboard" => array(getArrayForKeyboard ( $keyboard )),
+								"keyboard" => array (
+										getArrayForKeyboard ( $keyboard ) 
+								),
 								"one_time_keyboard" => true,
 								"selextive" => true 
 						) 

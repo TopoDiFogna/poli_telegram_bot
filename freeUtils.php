@@ -12,16 +12,7 @@ function retriveObject($filePath) {
 		return array ();
 	} else {
 		$allObj = fread ( $myfile, filesize ( $filePath ) );
-		$objArraySer = explode ( "$$$", $allObj );
-		$objArray = array ();
-		foreach ($objArraySer as $string){
-			error_log($string);
-		}
-		foreach ( $objArraySer as $objSer ) {
-			$obj = unserialize ( $objSer );
-			array_push ( $objArray, $obj );
-		}
-		return $objArray;
+		$objArray = unserialize ( $allObj );
 	}
 }
 
@@ -45,13 +36,9 @@ function getArrayForKeyboard($filePath) {
  * @param string $fileDestinationPath        	
  */
 function serializeObject($ObjArray, $fileDestinationPath) {
-	$string = "";
-	foreach ( $ObjArray as $obj ) {
-		$serialized = serialize ( $obj );
-		$string=$string.$serialized."$$$";
-	}
+	$serialized = serialize ( $ObjArray );
 	$myfile=fopen($fileDestinationPath, "w");
-	fwrite($myfile, $string);
+	fwrite($myfile, $serialized);
 	fclose($myfile);
 }
 ?>

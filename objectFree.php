@@ -38,12 +38,12 @@ class freeObj {
 				if (isset ( $this->endTimeH )) {
 					if (isset ( $this->endTimeM )) {
 						if (! isset ( $this->day )) {
-							if($newProperty=="Today"){
+							if ($newProperty == "Today") {
 								$this->day = date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" );
-							}else{
-								$datetime = new DateTime(date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ));
-								$datetime->modify('+1 day');
-								$this->day=$datetime;
+							} else {
+								$datetime = new DateTime ( date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
+								$datetime->modify ( '+1 day' );
+								$this->day = $datetime;
 							}
 							
 							return true;
@@ -70,7 +70,14 @@ class freeObj {
 	}
 	public function getMessage_id() {
 		if (isset ( $this->message_id )) {
-			$this->message_id = $new_id;
+			return $this->message_id;
+		} else {
+			return false;
+		}
+	}
+	public function getChat_id() {
+		if (isset ( $this->chat_id )) {
+			return $this->chat_id;
 		} else {
 			return false;
 		}
@@ -78,11 +85,11 @@ class freeObj {
 	public function executeCommandFree() {
 		$deltahour = $this->startTimeH - $this->endTimeH;
 		if ($deltahour > 0) {
-			return classFree ( $this->chat_id, $this->startTimeH.":".$this->startTimeM, $this->endTimeH.":".$this->endTimeM, $this->day );
+			return classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
 		} elseif ($deltahour == 0) {
 			$deltaMinutes = $this->startTimeM - $this->endTimeM;
 			if ($deltaMinutes >= 0) {
-				return classFree ( $this->chat_id, $this->startTimeH.":".$this->startTimeM, $this->endTimeH.":".$this->endTimeM, $this->day );
+				return classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
 			}
 		}
 		return false;
