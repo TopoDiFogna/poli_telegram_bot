@@ -84,14 +84,13 @@ class freeObj {
 	public function executeCommandFree() {
 		$deltahour = $this->startTimeH - $this->endTimeH;
 		if ($deltahour > 0) {
-			return classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
+			classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
 		} elseif ($deltahour == 0) {
 			$deltaMinutes = $this->startTimeM - $this->endTimeM;
 			if ($deltaMinutes >= 0) {
-				return classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
+				classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
 			}
 		}
-		return false;
 	}
 }
 ?>
