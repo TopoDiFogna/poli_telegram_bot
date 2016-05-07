@@ -69,7 +69,7 @@ function sendMessage($chat_id, $text, $params) {
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
 			"Content-Type: application/json" 
 	) );
-	execCUrlRequest ( $handle );
+	return execCUrlRequest ( $handle );
 }
 /**
  * Sends file
