@@ -440,9 +440,6 @@ function startNewFreeChat($chat_id, $message_id) {
 			) 
 	) );
 	$messageSent=$messageSent["result"];
-	foreach ($messageSent as $key => $element){
-		error_log("Key: ".$key." value: ".$element);
-	}
 	$newMessageId = $messageSent ["message_id"];
 	$newObj->setMessage_id ( $newMessageId );
 	array_push ( $objArray, $newObj );
@@ -497,6 +494,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 								"selective" => true 
 						) 
 				) );
+				$messageSent=$messageSent["result"];
 				$newMessageId = $messageSent ["message_id"];
 				$obj->setMessage_id ( $newMessageId );
 			}
