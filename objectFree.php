@@ -39,15 +39,11 @@ class freeObj {
 					if (isset ( $this->endTimeM )) {
 						if (! isset ( $this->day )) {
 							if ($newProperty == "Today") {
-								error_log("sono nel Today");
 								$this->day = date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" );
-								error_log($this->day);
 							} else {
-								error_log("sono nell'else");
 								$datetime = new DateTime ( date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 								$datetime->modify ( '+1 day' );
 								$this->day = $datetime->format("d-m-Y");
-								error_log($this->day);
 							}
 							return true;
 						}
@@ -87,6 +83,7 @@ class freeObj {
 	}
 	public function executeCommandFree() {
 		$deltahour = intval($this->endTimeH) - intval($this->startTimeH);
+		error_log($this->chat_id." ".$this->startTimeH." ".$this->startTimeM." ".$this->endTimeH." ".$this->endTimeM." ".$this->day);
 		if ($deltahour > 0) {
 			classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
 			return true;
