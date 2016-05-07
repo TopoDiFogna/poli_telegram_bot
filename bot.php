@@ -356,7 +356,8 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 	sendMessage ( $chat_id, $answer, array (
 			'parse_mode' => 'Markdown',
 			'replay_markup' => array (
-					'hide_keyboard' => true 
+					'hide_keyboard' => true,
+					'selective' => true,
 			) 
 	) );
 }
@@ -434,8 +435,8 @@ function startNewFreeChat($chat_id, $message_id) {
 					"keyboard" => array (
 							getArrayForKeyboard ( "responses/hours.txt" ) 
 					),
-					"one_time_keyboard" => true,
-					"selextive" => true 
+					"one_time_keyboard" => false,
+					"selective" => true 
 			) 
 	) );
 	$newMessageId = $messageSent ["message_id"];
@@ -473,7 +474,8 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 					sendMessage ( $chat_id, "You gimme some wrong informations", array (
 							"reply_to_message_id" => $message_id,
 							'replay_markup' => array (
-									'hide_keyboard' => TRUE, 
+									'hide_keyboard' => true,
+									'selective' => true,
 							) 
 					) );
 				}
