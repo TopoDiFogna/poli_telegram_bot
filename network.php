@@ -39,12 +39,11 @@ function execCUrlRequest($handle) {
 		
 		return false;
 	}
-	$response = json_decode ( $response, true );
 	return $response;
 }
 /**
  * Send a message
- * 
+ *
  * @param int $chatId
  *        	chat it to send the message to
  * @param String $text
@@ -70,7 +69,9 @@ function sendMessage($chat_id, $text, $params) {
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
 			"Content-Type: application/json" 
 	) );
-	return execCUrlRequest ( $handle );
+	$response = execCUrlRequest ( $handle );
+	$response = json_decode ( $response, true );
+	return $response;
 }
 /**
  * Sends file
@@ -89,7 +90,7 @@ function sendFile($chatId, $filePath, $params) {
 		return false;
 	}
 	
-	$file = new CURLFile ( realpath($filePath) );
+	$file = new CURLFile ( realpath ( $filePath ) );
 	$params ["method"] = "sendDocument";
 	$params ["chat_id"] = $chatId;
 	$params ["document"] = $file;
@@ -124,7 +125,7 @@ function sendPhoto($chatId, $filePath, $params) {
 		error_log ( "Parameters must be an array in sendPhoto method" );
 		return false;
 	}
-	$file = new CURLFile ($filePath);
+	$file = new CURLFile ( $filePath );
 	$params ["method"] = "sendPhoto";
 	$params ["chat_id"] = $chatId;
 	$params ["photo"] = $file;
@@ -133,7 +134,7 @@ function sendPhoto($chatId, $filePath, $params) {
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
-	curl_setopt ( $handle, CURLOPT_POSTFIELDS,  $params);
+	curl_setopt ( $handle, CURLOPT_POSTFIELDS, $params );
 	curl_setopt ( $handle, CURLOPT_HTTPHEADER, array (
 			"Content-Type: multipart/form-data" 
 	) );
