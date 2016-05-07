@@ -503,7 +503,11 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 		serializeObject ( $objArray, "objects.txt" );
 	} else {
 		sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
-				"reply_to_message_id" => $message_id 
+				"reply_to_message_id" => $message_id,
+				'reply_markup' => array (
+						'hide_keyboard' => true,
+						'selective' => true,
+				)
 		) );
 	}
 }
