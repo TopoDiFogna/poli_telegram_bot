@@ -354,7 +354,10 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 	}
 	var_dump ( $answer );
 	sendMessage ( $chat_id, $answer, array (
-			'parse_mode' => 'Markdown' 
+			'parse_mode' => 'Markdown',
+			'replay_markup' => array(
+					'hide_keyboard' => true,
+			)
 	) );
 }
 

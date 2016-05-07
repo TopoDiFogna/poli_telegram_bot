@@ -82,13 +82,12 @@ class freeObj {
 		}
 	}
 	public function executeCommandFree() {
-		//TODO sistemare il delta
-		$deltahour = $this->endTimeH - $this->starTimeH;
+		$deltahour = intval($this->endTimeH,10) - intval($this->starTimeH,10);
 		if ($deltahour > 0) {
 			classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
 			return true;
 		} elseif ($deltahour == 0) {
-			$deltaMinutes = $this->endTimeM - $this->startTimeM;
+			$deltaMinutes = intval($this->endTimeM,10) - intval($this->startTimeM,10);
 			if ($deltaMinutes >= 0) {
 				classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
 				return true;
