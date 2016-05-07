@@ -82,9 +82,9 @@ class freeObj {
 		}
 	}
 	public function executeCommandFree() {
-		$deltahour = intval($this->endTimeH) - intval($this->starTimeH);
+		$deltahour = intval($this->endTimeH) - intval($this->startTimeH);
 		error_log($this->endTimeH." ".$this->startTimeH);
-		error_log(intval($this->endTimeH)." ".intval($this->starTimeH));
+		error_log(intval($this->endTimeH)." ".intval($this->startTimeH));
 		error_log("--------------------------".$deltahour);
 		return false;
 		if ($deltahour > 0) {
