@@ -473,7 +473,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 					sendMessage ( $chat_id, "You gimme some wrong informations", array (
 							"reply_to_message_id" => $message_id,
 							'replay_markup' => array (
-									'hide_keyboard' => true 
+									'hide_keyboard' => TRUE, 
 							) 
 					) );
 				}
