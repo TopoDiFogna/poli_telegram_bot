@@ -39,11 +39,15 @@ class freeObj {
 					if (isset ( $this->endTimeM )) {
 						if (! isset ( $this->day )) {
 							if ($newProperty == "Today") {
+								error_log("sono nel Today");
 								$this->day = date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" );
+								error_log($this->day);
 							} else {
+								error_log("sono nell'else");
 								$datetime = new DateTime ( date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
 								$datetime->modify ( '+1 day' );
 								$this->day = $datetime->format("d-m-Y");
+								error_log($this->day);
 							}
 							return true;
 						}
