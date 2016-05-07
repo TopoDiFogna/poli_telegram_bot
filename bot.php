@@ -436,6 +436,7 @@ function startNewFreeChat($chat_id, $message_id) {
 							getArrayForKeyboard ( "responses/hours.txt" ) 
 					),
 					"one_time_keyboard" => false,
+					'resize_keyboard' => true,
 					"selective" => true 
 			) 
 	) );
@@ -489,6 +490,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 										getArrayForKeyboard ( $keyboard ) 
 								),
 								"one_time_keyboard" => false,
+								'resize_keyboard' => true,
 								"selective" => true 
 						) 
 				) );
