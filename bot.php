@@ -483,8 +483,8 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 								"keyboard" => array (
 										getArrayForKeyboard ( $keyboard ) 
 								),
-								"one_time_keyboard" => true,
-								"selextive" => true 
+								"one_time_keyboard" => false,
+								"selective" => true 
 						) 
 				) );
 				$newMessageId = $messageSent ["message_id"];
