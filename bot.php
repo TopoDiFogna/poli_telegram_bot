@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Process the incoming message
  * 
@@ -7,15 +6,18 @@
  */
 function processMessage($message) {
 	$message_id = $message ['message_id']; // used in replies
+	$chat_id = $message ['chat'] ['id'];
+	$response_id = - 1; // chat to send the message to
+	if (isset ( $message ['reply_to_message'] )) {
+		$response_id = $message ['reply_to_message'] ['message_id'];
+	}
 	
-	$chat_id = $message ['chat'] ['id']; // chat to send the message to
-	                                     
 	// checks what type of message is incoming and perform the correct operation
 	switch ($message) {
 		case array_key_exists ( 'text', $message ) :
 			$text_message = $message ['text'];
 			$text_message = str_replace ( "@PoliMilanoBot", "", $text_message );
-			processTextMessage ( $text_message, $chat_id, $message_id );
+			processTextMessage ( $text_message, $chat_id, $message_id, $response_id );
 			break;
 		case array_key_exists ( 'audio', $message ) :
 			break;
@@ -45,7 +47,7 @@ function processMessage($message) {
  * @param int $message_id
  *        	the id of the message to reply to
  */
-function processTextMessage($text, $chat_id, $message_id) {
+function processTextMessage($text, $chat_id, $message_id, $response_id) {
 	$command = explode ( " ", $text );
 	switch ($command [0]) {
 		case "/start" :
@@ -77,23 +79,25 @@ function processTextMessage($text, $chat_id, $message_id) {
 			}
 			break;
 		case "/free" :
-			if (count ( $command ) < 3) {
-				$file = fopen ( "./responses/free.txt", "r" );
-				$response = fread ( $file, filesize ( "./responses/free.txt" ) );
+			error_log ( "--------------------------------------------------------------" . PHP_EOL );
+			if (count ( $command ) == 1) {
+				startNewFreeChat ( $chat_id, $message_id );
+			}
+			if (count ( $command ) < 3 && count ( $command ) > 1) {
+				$file = fopen ( "responses/free.txt", "r" );
+				$response = fread ( $file, filesize ( "responses/free.txt" ) );
 				fclose ( $file );
 				sendMessage ( $chat_id, $response, array (
 						'parse_mode' => 'Markdown' 
 				) );
 			} else if (isset ( $command [3] )) {
-				classFree ( $chat_id, $command [1], $command [2], $command [3] );
-			} else {
-				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
+				classFree ( $chat_id, $command [1], $command [2], $command [3],$message_id);
+			} else if (count ( $command ) == 3) {
+				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ),$message_id);
 			}
 			break;
 		default :
-			sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
-					"reply_to_message_id" => $message_id 
-			) );
+			parseFreeMessage ( $chat_id, $message_id, $response_id, $command [0] );
 			break;
 	}
 }
@@ -250,9 +254,9 @@ function classOccupation($chat_id, $className, $date) {
 			$cmdLine = "/var/www/telegrambotbin/wkhtmltoimage --quality 30 --load-error-handling ignore /var/www/telegrambot/files/" . $classId . ".html /var/www/telegrambot/files/" . $classId . ".jpeg";
 			shell_exec ( $cmdLine );
 			$filePath = realpath ( "files/" . $classId . '.jpeg' );
-			$photoResponse=sendPhoto ( $chat_id, $filePath, array () );
-			if($photoResponse === false){
-				error_log("Error in sending Photo");
+			$photoResponse = sendPhoto ( $chat_id, $filePath, array () );
+			if ($photoResponse === false) {
+				error_log ( "Error in sending Photo" );
 			}
 		}
 	} else
@@ -270,7 +274,9 @@ function classOccupation($chat_id, $className, $date) {
  * @param String $time
  *        	the date used to make the search
  */
-function classFree($chat_id, $startTime, $endTime, $time) {
+function classFree($chat_id, $startTime, $endTime, $time,$message_id) {
+	error_log ( "mi hanno chiamato" );
+	error_log("I miei parametri: ".$chat_id." ".$startTime." ".$endTime." ".$time );
 	$time = fixDayString ( $time );
 	$date = strtotime ( $time );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
@@ -315,42 +321,58 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 	// Create the document with only the needed table
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
-	$dom->loadHTML ( $result );
-	$selection = $dom->getElementById ( "div_table_aule" );
-	$newdom = new DOMDocument ();
-	$cloned = $selection->cloneNode ( TRUE );
-	$newdom->appendChild ( $newdom->importNode ( $cloned, TRUE ) );
-	$finder = new DomXPath ( $newdom );
-	$nodes = $finder->query ( '//tbody[@class="TableDati-tbody"]' );
-	$node = $nodes->item ( 0 );
-	
-	// extract the list of available classroom
-	$answer = "";
-	if ($node->hasChildNodes ()) {
-		$parents = $node->childNodes;
-		$last = ($parents->length) - 1;
-		foreach ( $parents as $i => $parent ) {
-			$childs = $parent->childNodes;
-			$string = "";
-			foreach ( $childs as $j => $child ) {
-				if ($j == 2) {
-					if ($child->hasChildNodes ()) {
-						$className = $child->childNodes->item ( 1 )->nodeValue;
-						$string = $string . $className;
+	if(!(strlen($result)==0)) {
+		$dom->loadHTML ( $result );
+		$selection = $dom->getElementById ( "div_table_aule" );
+		$newdom = new DOMDocument ();
+		$cloned = $selection->cloneNode ( TRUE );
+		$newdom->appendChild ( $newdom->importNode ( $cloned, TRUE ) );
+		$finder = new DomXPath ( $newdom );
+		$nodes = $finder->query ( '//tbody[@class="TableDati-tbody"]' );
+		$node = $nodes->item ( 0 );
+		
+		// extract the list of available classroom
+		$answer = "";
+		if ($node->hasChildNodes ()) {
+			$parents = $node->childNodes;
+			$last = ($parents->length) - 1;
+			foreach ( $parents as $i => $parent ) {
+				$childs = $parent->childNodes;
+				$string = "";
+				foreach ( $childs as $j => $child ) {
+					if ($j == 2) {
+						if ($child->hasChildNodes ()) {
+							$className = $child->childNodes->item ( 1 )->nodeValue;
+							$string = $string . $className;
+						}
 					}
 				}
-			}
-			if (! ($i == $last)) {
-				$answer = $answer . $string . "\n";
-			} else {
-				$answer = $answer . $string;
+				if (! ($i == $last)) {
+					$answer = $answer . $string . "\n";
+				} else {
+					$answer = $answer . $string;
+				}
 			}
 		}
+		sendMessage ( $chat_id, $answer, array (
+				"reply_to_message_id" => $message_id,
+				'parse_mode' => 'Markdown',
+				'reply_markup' => array (
+						'hide_keyboard' => true,
+						'selective' => true,
+				) 
+		) );
 	}
-	var_dump ( $answer );
-	sendMessage ( $chat_id, $answer, array (
-			'parse_mode' => 'Markdown' 
-	) );
+	else{
+		sendMessage ( $chat_id, "I've encountered a error in the Polimi Server. It's not my fault ;)", array (
+				"reply_to_message_id" => $message_id,
+				'parse_mode' => 'Markdown',
+				'reply_markup' => array (
+						'hide_keyboard' => true,
+						'selective' => true,
+				)
+		) );
+	}
 }
 
 /**
@@ -405,5 +427,105 @@ function fixDayString($unfixedDate) {
 	$newString = str_replace ( "/", "-", $unfixedDate );
 	$newString = str_replace ( ".", "-", $newString );
 	return $newString;
+}
+
+/**
+ * This function send to the $chat_id and $message_id the first keyboard in order to start the the new command free
+ * with keyboard
+ *
+ * @param unknown $chat_id        	
+ * @param unknown $message_id        	
+ */
+function startNewFreeChat($chat_id, $message_id) {
+	$objArray = retriveObject ( "objects.txt" );
+	$parameters = array (
+			"chat_id" => $chat_id 
+	);
+	$newObj = new freeObj ( $parameters );
+	$messageSent = sendMessage ( $chat_id, "Please Select the startTime Hour", array (
+			"reply_to_message_id" => $message_id,
+			"reply_markup" => array (
+					"keyboard" => array (
+							getArrayForKeyboard ( "responses/hours.txt" ) 
+					),
+					"one_time_keyboard" => false,
+					'resize_keyboard' => true,
+					"selective" => true 
+			) 
+	) );
+	$messageSent=$messageSent["result"];
+	$newMessageId = $messageSent ["message_id"];
+	$newObj->setMessage_id ( $newMessageId );
+	array_push ( $objArray, $newObj );
+	serializeObject ( $objArray, "objects.txt" );
+}
+
+/**
+ * This function do the parsing of the message without /, if they are a response of a free keyBoard, it either send the
+ * next keybord or the list of free classrooms
+ *
+ * @param
+ *        	$chat_id
+ * @param
+ *        	$message_id
+ * @param
+ *        	$replay_message
+ * @param
+ *        	$text
+ */
+function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
+	$objArray = retriveObject ( "objects.txt" );
+	$found = false;
+	foreach ( $objArray as $key => $obj ) {
+		$idToCompare = $obj->getMessage_id ();
+		$chatToCompare = $obj->getChat_id ();
+		if (($idToCompare == $replay_message or $replay_message == - 1) and ($chatToCompare == $chat_id)) {
+			$returnValue = $obj->addProperty ( $text );
+			$found = true;
+			if (is_bool ( $returnValue )) {
+				$obj->setMessage_id($message_id);
+				$result = $obj->executeCommandFree ();
+				unset ( $objArray [$key] );
+				if (! $result) {
+					sendMessage ( $chat_id, "You gimme some wrong informations", array (
+							"reply_to_message_id" => $message_id,
+							'reply_markup' => array (
+									'hide_keyboard' => true,
+									'selective' => true,
+							) 
+					) );
+				}
+			} else {
+				$stringResult = explode ( " ", $returnValue );
+				$keyboard = "responses/" . $stringResult [1] . ".txt";
+				$messageSent = sendMessage ( $chat_id, "Please Select the " . $returnValue, array (
+						"reply_to_message_id" => $message_id,
+						"reply_markup" => array (
+								"keyboard" => array (
+										getArrayForKeyboard ( $keyboard ) 
+								),
+								"one_time_keyboard" => false,
+								'resize_keyboard' => true,
+								"selective" => true 
+						) 
+				) );
+				$messageSent=$messageSent["result"];
+				$newMessageId = $messageSent ["message_id"];
+				$obj->setMessage_id ( $newMessageId );
+			}
+			break;
+		}
+	}
+	if ($found) {
+		serializeObject ( $objArray, "objects.txt" );
+	} else {
+		sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
+				"reply_to_message_id" => $message_id,
+				'reply_markup' => array (
+						'hide_keyboard' => true,
+						'selective' => true,
+				)
+		) );
+	}
 }
 ?>
