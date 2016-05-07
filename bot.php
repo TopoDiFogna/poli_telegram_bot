@@ -483,7 +483,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 			$returnValue = $obj->addProperty ( $text );
 			$found = true;
 			if (is_bool ( $returnValue )) {
-				$obj->setsetMessage_id($message_id);
+				$obj->setMessage_id($message_id);
 				$result = $obj->executeCommandFree ();
 				unset ( $objArray [$key] );
 				if (! $result) {
