@@ -321,45 +321,56 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 	// Create the document with only the needed table
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
-	$dom->loadHTML ( $result );
-	$selection = $dom->getElementById ( "div_table_aule" );
-	$newdom = new DOMDocument ();
-	$cloned = $selection->cloneNode ( TRUE );
-	$newdom->appendChild ( $newdom->importNode ( $cloned, TRUE ) );
-	$finder = new DomXPath ( $newdom );
-	$nodes = $finder->query ( '//tbody[@class="TableDati-tbody"]' );
-	$node = $nodes->item ( 0 );
-	
-	// extract the list of available classroom
-	$answer = "";
-	if ($node->hasChildNodes ()) {
-		$parents = $node->childNodes;
-		$last = ($parents->length) - 1;
-		foreach ( $parents as $i => $parent ) {
-			$childs = $parent->childNodes;
-			$string = "";
-			foreach ( $childs as $j => $child ) {
-				if ($j == 2) {
-					if ($child->hasChildNodes ()) {
-						$className = $child->childNodes->item ( 1 )->nodeValue;
-						$string = $string . $className;
+	if(!(strlen($result)==0)) {
+		$dom->loadHTML ( $result );
+		$selection = $dom->getElementById ( "div_table_aule" );
+		$newdom = new DOMDocument ();
+		$cloned = $selection->cloneNode ( TRUE );
+		$newdom->appendChild ( $newdom->importNode ( $cloned, TRUE ) );
+		$finder = new DomXPath ( $newdom );
+		$nodes = $finder->query ( '//tbody[@class="TableDati-tbody"]' );
+		$node = $nodes->item ( 0 );
+		
+		// extract the list of available classroom
+		$answer = "";
+		if ($node->hasChildNodes ()) {
+			$parents = $node->childNodes;
+			$last = ($parents->length) - 1;
+			foreach ( $parents as $i => $parent ) {
+				$childs = $parent->childNodes;
+				$string = "";
+				foreach ( $childs as $j => $child ) {
+					if ($j == 2) {
+						if ($child->hasChildNodes ()) {
+							$className = $child->childNodes->item ( 1 )->nodeValue;
+							$string = $string . $className;
+						}
 					}
 				}
-			}
-			if (! ($i == $last)) {
-				$answer = $answer . $string . "\n";
-			} else {
-				$answer = $answer . $string;
+				if (! ($i == $last)) {
+					$answer = $answer . $string . "\n";
+				} else {
+					$answer = $answer . $string;
+				}
 			}
 		}
+		sendMessage ( $chat_id, $answer, array (
+				'parse_mode' => 'Markdown',
+				'reply_markup' => array (
+						'hide_keyboard' => true,
+						'selective' => true,
+				) 
+		) );
 	}
-	sendMessage ( $chat_id, $answer, array (
-			'parse_mode' => 'Markdown',
-			'reply_markup' => array (
-					'hide_keyboard' => true,
-					'selective' => true,
-			) 
-	) );
+	else{
+		sendMessage ( $chat_id, "I've encountered a error in the Polimi Server. It's not my fault ;)", array (
+				'parse_mode' => 'Markdown',
+				'reply_markup' => array (
+						'hide_keyboard' => true,
+						'selective' => true,
+				)
+		) );
+	}
 }
 
 /**
