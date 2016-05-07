@@ -352,10 +352,9 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 			}
 		}
 	}
-	var_dump ( $answer );
 	sendMessage ( $chat_id, $answer, array (
 			'parse_mode' => 'Markdown',
-			'replay_markup' => array (
+			'reply_markup' => array (
 					'hide_keyboard' => true,
 					'selective' => true,
 			) 
@@ -474,7 +473,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 				if (! $result) {
 					sendMessage ( $chat_id, "You gimme some wrong informations", array (
 							"reply_to_message_id" => $message_id,
-							'replay_markup' => array (
+							'reply_markup' => array (
 									'hide_keyboard' => true,
 									'selective' => true,
 							) 
