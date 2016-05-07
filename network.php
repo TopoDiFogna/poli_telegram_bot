@@ -39,6 +39,7 @@ function execCUrlRequest($handle) {
 		
 		return false;
 	}
+	$response = json_decode ( $response, true );
 	return $response;
 }
 /**
