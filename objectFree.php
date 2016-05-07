@@ -83,6 +83,8 @@ class freeObj {
 	}
 	public function executeCommandFree() {
 		$deltahour = intval($this->endTimeH,10) - intval($this->starTimeH,10);
+		error_log("--------------------------".$deltahour);
+		return false;
 		if ($deltahour > 0) {
 			classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
 			return true;

@@ -7,7 +7,7 @@
 function processMessage($message) {
 	$message_id = $message ['message_id']; // used in replies
 	$chat_id = $message ['chat'] ['id'];
-	$response_id = -1; // chat to send the message to
+	$response_id = - 1; // chat to send the message to
 	if (isset ( $message ['reply_to_message'] )) {
 		$response_id = $message ['reply_to_message'] ['message_id'];
 	}
@@ -275,7 +275,7 @@ function classOccupation($chat_id, $className, $date) {
  *        	the date used to make the search
  */
 function classFree($chat_id, $startTime, $endTime, $time) {
-	error_log("mi hanno chiamato");
+	error_log ( "mi hanno chiamato" );
 	$time = fixDayString ( $time );
 	$date = strtotime ( $time );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
@@ -355,9 +355,9 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 	var_dump ( $answer );
 	sendMessage ( $chat_id, $answer, array (
 			'parse_mode' => 'Markdown',
-			'replay_markup' => array(
-					'hide_keyboard' => true,
-			)
+			'replay_markup' => array (
+					'hide_keyboard' => true 
+			) 
 	) );
 }
 
@@ -467,15 +467,18 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 			$returnValue = $obj->addProperty ( $text );
 			$found = true;
 			if (is_bool ( $returnValue )) {
-				$result=$obj->executeCommandFree ();
+				$result = $obj->executeCommandFree ();
 				unset ( $objArray [$key] );
-				if(!$result){
+				if (! $result) {
 					sendMessage ( $chat_id, "You gimme some wrong informations", array (
-							"reply_to_message_id" => $message_id
+							"reply_to_message_id" => $message_id,
+							'replay_markup' => array (
+									'hide_keyboard' => true 
+							) 
 					) );
 				}
 			} else {
-				$stringResult = explode (" ", $returnValue);
+				$stringResult = explode ( " ", $returnValue );
 				$keyboard = "responses/" . $stringResult [1] . ".txt";
 				$messageSent = sendMessage ( $chat_id, "Please Select the " . $returnValue, array (
 						"reply_to_message_id" => $message_id,
