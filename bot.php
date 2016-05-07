@@ -439,6 +439,7 @@ function startNewFreeChat($chat_id, $message_id) {
 					"selective" => true 
 			) 
 	) );
+	error_log(is_array($messageSent));
 	$newMessageId = $messageSent ["message_id"];
 	$newObj->setMessage_id ( $newMessageId );
 	array_push ( $objArray, $newObj );
