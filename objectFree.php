@@ -85,12 +85,12 @@ class freeObj {
 		$deltahour = intval($this->endTimeH) - intval($this->startTimeH);
 		error_log($this->chat_id." ".$this->startTimeH." ".$this->startTimeM." ".$this->endTimeH." ".$this->endTimeM." ".$this->day);
 		if ($deltahour > 0) {
-			classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
+			classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day,$this->message_id );
 			return true;
 		} elseif ($deltahour == 0) {
 			$deltaMinutes = intval($this->endTimeM,10) - intval($this->startTimeM,10);
 			if ($deltaMinutes >= 0) {
-				classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day );
+				classFree ( $this->chat_id, $this->startTimeH . ":" . $this->startTimeM, $this->endTimeH . ":" . $this->endTimeM, $this->day,$this->message_id );
 				return true;
 			}
 			else{

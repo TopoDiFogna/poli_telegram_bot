@@ -91,9 +91,9 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 						'parse_mode' => 'Markdown' 
 				) );
 			} else if (isset ( $command [3] )) {
-				classFree ( $chat_id, $command [1], $command [2], $command [3] );
+				classFree ( $chat_id, $command [1], $command [2], $command [3],$message_id);
 			} else if (count ( $command ) == 3) {
-				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ) );
+				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ),$message_id);
 			}
 			break;
 		default :
@@ -274,7 +274,7 @@ function classOccupation($chat_id, $className, $date) {
  * @param String $time
  *        	the date used to make the search
  */
-function classFree($chat_id, $startTime, $endTime, $time) {
+function classFree($chat_id, $startTime, $endTime, $time,$message_id) {
 	error_log ( "mi hanno chiamato" );
 	error_log("I miei parametri: ".$chat_id." ".$startTime." ".$endTime." ".$time );
 	$time = fixDayString ( $time );
@@ -355,17 +355,21 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 			}
 		}
 		sendMessage ( $chat_id, $answer, array (
+				"reply_to_message_id" => $message_id,
 				'parse_mode' => 'Markdown',
 				'reply_markup' => array (
 						'hide_keyboard' => true,
+						'selective' => true,
 				) 
 		) );
 	}
 	else{
 		sendMessage ( $chat_id, "I've encountered a error in the Polimi Server. It's not my fault ;)", array (
+				"reply_to_message_id" => $message_id,
 				'parse_mode' => 'Markdown',
 				'reply_markup' => array (
 						'hide_keyboard' => true,
+						'selective' => true,
 				)
 		) );
 	}
@@ -479,6 +483,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 			$returnValue = $obj->addProperty ( $text );
 			$found = true;
 			if (is_bool ( $returnValue )) {
+				$obj->setsetMessage_id($message_id);
 				$result = $obj->executeCommandFree ();
 				unset ( $objArray [$key] );
 				if (! $result) {
