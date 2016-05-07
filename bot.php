@@ -358,7 +358,6 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 				'parse_mode' => 'Markdown',
 				'reply_markup' => array (
 						'hide_keyboard' => true,
-						'selective' => true,
 				) 
 		) );
 	}
@@ -367,7 +366,6 @@ function classFree($chat_id, $startTime, $endTime, $time) {
 				'parse_mode' => 'Markdown',
 				'reply_markup' => array (
 						'hide_keyboard' => true,
-						'selective' => true,
 				)
 		) );
 	}
