@@ -79,7 +79,6 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 			}
 			break;
 		case "/free" :
-			error_log ( "--------------------------------------------------------------" . PHP_EOL );
 			if (count ( $command ) == 1) {
 				startNewFreeChat ( $chat_id, $message_id );
 			}
@@ -183,7 +182,6 @@ function createOccupationFile($date, $file_path) {
 	$file = fopen ( $file_path, "w" );
 	fwrite ( $file, $domOfHTML->saveHTML () );
 	fclose ( $file );
-	error_log ( "file creato " . $date );
 	return true;
 }
 /**
@@ -256,7 +254,7 @@ function classOccupation($chat_id, $className, $date) {
 			$filePath = realpath ( "files/" . $classId . '.jpeg' );
 			$photoResponse = sendPhoto ( $chat_id, $filePath, array () );
 			if ($photoResponse === false) {
-				error_log ( "Error in sending Photo" );
+				error_log ( "Error in sending Photo for class occupation" );
 			}
 		}
 	} else
@@ -275,8 +273,6 @@ function classOccupation($chat_id, $className, $date) {
  *        	the date used to make the search
  */
 function classFree($chat_id, $startTime, $endTime, $time,$message_id) {
-	error_log ( "mi hanno chiamato" );
-	error_log("I miei parametri: ".$chat_id." ".$startTime." ".$endTime." ".$time );
 	$time = fixDayString ( $time );
 	$date = strtotime ( $time );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
