@@ -86,7 +86,7 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 			if (count ( $command ) == 1) {
 				startNewFreeChat ( $chat_id, $message_id );
 			}
-			if (count ( $command ) < 3 && count ( $command ) > 1) {
+			if (count ( $command ) == 2) {
 				$file = fopen ( "responses/free.txt", "r" );
 				$response = fread ( $file, filesize ( "responses/free.txt" ) );
 				fclose ( $file );
@@ -276,9 +276,9 @@ function classOccupation($chat_id, $className, $date) {
  * @param String $time
  *        	the date used to make the search
  */
-function classFree($chat_id, $startTime, $endTime, $time,$message_id) {
-	$time = fixDayString ( $time );
-	$date = strtotime ( $time );
+function classFree($chat_id, $startTime, $endTime, $date,$message_id) {
+	$date = fixDayString ( $date );
+	$date = strtotime ( $date );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
 	$param = array (
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___postBack' => 'true',
