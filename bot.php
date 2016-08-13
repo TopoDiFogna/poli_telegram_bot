@@ -37,9 +37,13 @@ function processMessage($message) {
 			break;
 	}
 }
-
-function process_Inline_Query($inline_query){
-	
+/**
+ * Processes the received query
+ *
+ * @param $inline_query the
+ *        	received query
+ */
+function process_Inline_Query($inline_query) {
 }
 /**
  * Parses the incoming text message and perform the approrpiate action
@@ -94,13 +98,13 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 						'parse_mode' => 'Markdown' 
 				) );
 			} else if (isset ( $command [3] )) {
-				classFree ( $chat_id, $command [1], $command [2], $command [3],$message_id);
+				classFree ( $chat_id, $command [1], $command [2], $command [3], $message_id );
 			} else if (count ( $command ) == 3) {
-				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ),$message_id);
+				classFree ( $chat_id, $command [1], $command [2], date ( "j" ) . "-" . date ( "n" ) . "-" . date ( "Y" ), $message_id );
 			}
 			break;
 		default :
-			unknown_Message($chat_id, $message_id);
+			unknown_Message ( $chat_id, $message_id );
 			break;
 	}
 }
@@ -276,7 +280,7 @@ function classOccupation($chat_id, $className, $date) {
  * @param String $date_sent
  *        	the date used to make the search
  */
-function classFree($chat_id, $startTime, $endTime, $date_sent,$message_id) {
+function classFree($chat_id, $startTime, $endTime, $date_sent, $message_id) {
 	$date_sent = fixDayString ( $date_sent );
 	$date = strtotime ( $date_sent );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
@@ -321,7 +325,7 @@ function classFree($chat_id, $startTime, $endTime, $date_sent,$message_id) {
 	// Create the document with only the needed table
 	$dom = new DOMDocument ();
 	$internalErrors = libxml_use_internal_errors ( true );
-	if(!(strlen($result)==0)) {
+	if (! (strlen ( $result ) == 0)) {
 		$dom->loadHTML ( $result );
 		$selection = $dom->getElementById ( "div_table_aule" );
 		$newdom = new DOMDocument ();
@@ -359,18 +363,17 @@ function classFree($chat_id, $startTime, $endTime, $date_sent,$message_id) {
 				'parse_mode' => 'Markdown',
 				'reply_markup' => array (
 						'hide_keyboard' => true,
-						'selective' => true,
+						'selective' => true 
 				) 
 		) );
-	}
-	else{
+	} else {
 		sendMessage ( $chat_id, "I've encountered a error in the Polimi Server. It's not my fault ;)", array (
 				"reply_to_message_id" => $message_id,
 				'parse_mode' => 'Markdown',
 				'reply_markup' => array (
 						'hide_keyboard' => true,
-						'selective' => true,
-				)
+						'selective' => true 
+				) 
 		) );
 	}
 }
@@ -453,7 +456,7 @@ function startNewFreeChat($chat_id, $message_id) {
 					"selective" => true 
 			) 
 	) );
-	$messageSent=$messageSent["result"];
+	$messageSent = $messageSent ["result"];
 	$newMessageId = $messageSent ["message_id"];
 	$newObj->setMessage_id ( $newMessageId );
 	array_push ( $objArray, $newObj );
@@ -483,7 +486,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 			$returnValue = $obj->addProperty ( $text );
 			$found = true;
 			if (is_bool ( $returnValue )) {
-				$obj->setMessage_id($message_id);
+				$obj->setMessage_id ( $message_id );
 				$result = $obj->executeCommandFree ();
 				unset ( $objArray [$key] );
 				if (! $result) {
@@ -491,7 +494,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 							"reply_to_message_id" => $message_id,
 							'reply_markup' => array (
 									'hide_keyboard' => true,
-									'selective' => true,
+									'selective' => true 
 							) 
 					) );
 				}
@@ -509,7 +512,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 								"selective" => true 
 						) 
 				) );
-				$messageSent=$messageSent["result"];
+				$messageSent = $messageSent ["result"];
 				$newMessageId = $messageSent ["message_id"];
 				$obj->setMessage_id ( $newMessageId );
 			}
@@ -519,17 +522,24 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 	if ($found) {
 		serializeObject ( $objArray, "objects.txt" );
 	} else {
-		unknown_Message($chat_id, $message_id);
+		unknown_Message ( $chat_id, $message_id );
 	}
 }
-
-function unknown_Message($chat_id, $message_id){
+/**
+ * Answers with an unknown answe message if the command is not recognised
+ *
+ * @param int $chat_id
+ *        	the chat id to send the message to
+ * @param int $message_id
+ *        	the messsage id if this is a response
+ */
+function unknown_Message($chat_id, $message_id) {
 	sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
 			"reply_to_message_id" => $message_id,
 			'reply_markup' => array (
 					'hide_keyboard' => true,
-					'selective' => true,
-			)
+					'selective' => true 
+			) 
 	) );
 }
 ?>
