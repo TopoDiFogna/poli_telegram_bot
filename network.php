@@ -142,7 +142,7 @@ function sendPhoto($chatId, $filePath, $params) {
 	if ($response === false) {
 		return false;
 	}
-	return response;
+	return $response;
 }
 /**
  * Makes a cUrl request by a GET method
