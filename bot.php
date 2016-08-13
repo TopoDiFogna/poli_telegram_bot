@@ -104,7 +104,7 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 			}
 			break;
 		default :
-			unknown_Message ( $chat_id, $message_id );
+			parseFreeMessage ( $chat_id, $message_id, $response_id, $command [0] );
 			break;
 	}
 }
