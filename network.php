@@ -7,6 +7,7 @@ function createApiUrl() {
 	$token = fread ( $file, filesize ( $filePath ) );
 	fclose ( $file );
 	$apiUrlToken = API_URL . $token;
+	$apiUrlToken = str_replace("\n", "", $apiUrlToken);
 	return $apiUrlToken;
 }
 
