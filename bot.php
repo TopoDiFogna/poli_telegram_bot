@@ -233,6 +233,7 @@ function classOccupation($chat_id, $className, $date) {
 	$date = fixDayString ( $date );
 	$time = strtotime ( $date );
 	$className = str_replace ( ".", "", $className );
+	$className = strtoupper($className);
 	$classId = idOfGivenClassroom ( $className );
 	if ($classId != - 1) {
 		$cookieUrl = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?evn_init=event&idaula=" . $classId . "&jaf_currentWFID=main";
