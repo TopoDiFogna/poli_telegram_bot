@@ -1,6 +1,10 @@
 <?php
 // url to query the bot
 define ( 'API_URL', 'https://api.telegram.org/bot' );
+/**
+ * Creates the correct url for the bot
+ * @return String the complete url used by the bot
+ */
 function createApiUrl() {
 	$filePath = "token.txt";
 	$file = fopen ( $filePath, "r" );
@@ -68,7 +72,6 @@ function sendMessage($chat_id, $text, $params) {
 	$params ["chat_id"] = $chat_id;
 	$handle = curl_init ();
 	$url = createApiUrl ();
-	error_log ( $url );
 	curl_setopt ( $handle, CURLOPT_URL, $url );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
