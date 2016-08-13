@@ -273,12 +273,12 @@ function classOccupation($chat_id, $className, $date) {
  *        	the time used as a start time for the search
  * @param String $endTime
  *        	the time used as an end time for the search
- * @param String $time
+ * @param String $date_sent
  *        	the date used to make the search
  */
-function classFree($chat_id, $startTime, $endTime, $date,$message_id) {
-	$date = fixDayString ( $date );
-	$date = strtotime ( $date );
+function classFree($chat_id, $startTime, $endTime, $date_sent,$message_id) {
+	$date_sent = fixDayString ( $date_sent );
+	$date = strtotime ( $date_sent );
 	$url = "https://www7.ceda.polimi.it/spazi/spazi/controller/RicercaAuleLibere.do?jaf_currentWFID=main";
 	$param = array (
 			'spazi___model___formbean___RicercaAvanzataAuleLibereVO___postBack' => 'true',
