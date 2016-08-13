@@ -1,9 +1,19 @@
 <?php
-// token of the bot to keep secret
-define ( 'BOT_TOKEN', '142518261:AAGi48H9GL-oQxw_cQFVmwFnPVT6KBVFty0' );
-
 // url to query the bot
-define ( 'API_URL', 'https://api.telegram.org/bot' . BOT_TOKEN . '/' );
+define ( 'API_URL', 'https://api.telegram.org/bot' );
+/**
+ * Creates the correct url for the bot
+ * @return String the complete url used by the bot
+ */
+function createApiUrl() {
+	$filePath = "token.txt";
+	$file = fopen ( $filePath, "r" );
+	$token = fread ( $file, filesize ( $filePath ) );
+	fclose ( $file );
+	$apiUrlToken = API_URL . $token;
+	$apiUrlToken = str_replace("\n", "", $apiUrlToken);
+	return $apiUrlToken;
+}
 
 /**
  * Makes a cUrl request
@@ -61,7 +71,8 @@ function sendMessage($chat_id, $text, $params) {
 	$params ["text"] = $text;
 	$params ["chat_id"] = $chat_id;
 	$handle = curl_init ();
-	curl_setopt ( $handle, CURLOPT_URL, API_URL );
+	$url = createApiUrl ();
+	curl_setopt ( $handle, CURLOPT_URL, $url );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
@@ -95,7 +106,8 @@ function sendFile($chatId, $filePath, $params) {
 	$params ["chat_id"] = $chatId;
 	$params ["document"] = $file;
 	$handle = curl_init ();
-	curl_setopt ( $handle, CURLOPT_URL, API_URL );
+	$url = createApiUrl ();
+	curl_setopt ( $handle, CURLOPT_URL, $url );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
@@ -130,7 +142,8 @@ function sendPhoto($chatId, $filePath, $params) {
 	$params ["chat_id"] = $chatId;
 	$params ["photo"] = $file;
 	$handle = curl_init ();
-	curl_setopt ( $handle, CURLOPT_URL, API_URL );
+	$url = createApiUrl ();
+	curl_setopt ( $handle, CURLOPT_URL, $url );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
