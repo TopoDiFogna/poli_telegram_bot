@@ -1,7 +1,4 @@
 <?php
-// token of the bot to keep secret
-define ( 'BOT_TOKEN', '142518261:AAGi48H9GL-oQxw_cQFVmwFnPVT6KBVFty0' );
-
 // url to query the bot
 define ( 'API_URL', 'https://api.telegram.org/bot' . BOT_TOKEN . '/' );
 
