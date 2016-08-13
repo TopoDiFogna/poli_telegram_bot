@@ -5,7 +5,7 @@ include_once 'xmlUtils.php';
 include_once 'freeUtils.php';
 include_once 'objectFree.php';
 
-echo "<html><head></head><body><h2>Politecnico di Milano Telegram Bot FrontEnd</h2></body></html>";
+echo "<html><head></head><body><h2>Poli Telegram Bot FrontEnd</h2></body></html>";
 
 //reads the data from the request
 $content = file_get_contents("php://input");
