@@ -6,7 +6,7 @@ function createApiUrl() {
 	$file = fopen ( $filePath, "r" );
 	$token = fread ( $file, filesize ( $filePath ) );
 	fclose ( $file );
-	$apiUrlToken = API_URL . $token;
+	$apiUrlToken = API_URL . $token . "/";
 	return $apiUrlToken;
 }
 
@@ -66,7 +66,9 @@ function sendMessage($chat_id, $text, $params) {
 	$params ["text"] = $text;
 	$params ["chat_id"] = $chat_id;
 	$handle = curl_init ();
-	curl_setopt ( $handle, CURLOPT_URL, createApiUrl () );
+	$url = createApiUrl ();
+	error_log ( $url );
+	curl_setopt ( $handle, CURLOPT_URL, $url );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, true );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
@@ -100,7 +102,8 @@ function sendFile($chatId, $filePath, $params) {
 	$params ["chat_id"] = $chatId;
 	$params ["document"] = $file;
 	$handle = curl_init ();
-	curl_setopt ( $handle, CURLOPT_URL, createApiUrl () );
+	$url = createApiUrl ();
+	curl_setopt ( $handle, CURLOPT_URL, $url );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
@@ -135,7 +138,8 @@ function sendPhoto($chatId, $filePath, $params) {
 	$params ["chat_id"] = $chatId;
 	$params ["photo"] = $file;
 	$handle = curl_init ();
-	curl_setopt ( $handle, CURLOPT_URL, createApiUrl () );
+	$url = createApiUrl ();
+	curl_setopt ( $handle, CURLOPT_URL, $url );
 	curl_setopt ( $handle, CURLOPT_RETURNTRANSFER, 1 );
 	curl_setopt ( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 	curl_setopt ( $handle, CURLOPT_TIMEOUT, 60 );
