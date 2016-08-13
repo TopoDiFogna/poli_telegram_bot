@@ -6,7 +6,7 @@ function createApiUrl() {
 	$file = fopen ( $filePath, "r" );
 	$token = fread ( $file, filesize ( $filePath ) );
 	fclose ( $file );
-	$apiUrlToken = API_URL . $token . "/";
+	$apiUrlToken = API_URL . $token;
 	return $apiUrlToken;
 }
 
