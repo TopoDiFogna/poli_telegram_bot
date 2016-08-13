@@ -37,6 +37,10 @@ function processMessage($message) {
 			break;
 	}
 }
+
+function process_Inline_Query($inline_query){
+	
+}
 /**
  * Parses the incoming text message and perform the approrpiate action
  *
@@ -96,7 +100,7 @@ function processTextMessage($text, $chat_id, $message_id, $response_id) {
 			}
 			break;
 		default :
-			parseFreeMessage ( $chat_id, $message_id, $response_id, $command [0] );
+			unknown_Message($chat_id, $message_id);
 			break;
 	}
 }
@@ -515,13 +519,17 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 	if ($found) {
 		serializeObject ( $objArray, "objects.txt" );
 	} else {
-		sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
-				"reply_to_message_id" => $message_id,
-				'reply_markup' => array (
-						'hide_keyboard' => true,
-						'selective' => true,
-				)
-		) );
+		unknown_Message($chat_id, $message_id);
 	}
+}
+
+function unknown_Message($chat_id, $message_id){
+	sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
+			"reply_to_message_id" => $message_id,
+			'reply_markup' => array (
+					'hide_keyboard' => true,
+					'selective' => true,
+			)
+	) );
 }
 ?>

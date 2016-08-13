@@ -18,6 +18,16 @@ if (!count($result)) {
 	exit;
 }
 else {//otherwise process the message
-	processMessage($result["message"]);
+	switch ($result){
+		case array_key_exists("message", $result) :
+			processMessage($result["message"]);
+			break;
+		case array_key_exists("edited_message", $result) :
+			processMessage($result["edited_message"]);
+			break;
+		case array_key_exists("inline_query", $result) :
+			process_Inline_Query($result["inline_query"]);
+			break;
+	}
 }
 ?>
