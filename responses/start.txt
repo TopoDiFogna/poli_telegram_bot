@@ -22,4 +22,3 @@ I'm in the first official release, so I support only Leonardo classrooms.
 All the content enclosed by `[]` is optional.
 
 I Hope I will be Useful !!
-_RM_

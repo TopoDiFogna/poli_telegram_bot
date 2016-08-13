@@ -536,7 +536,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
  *        	the messsage id if this is a response
  */
 function unknown_Message($chat_id, $message_id) {
-	sendMessage ( $chat_id, "Sory, I don't know this command :( Use /help for more information", array (
+	sendMessage ( $chat_id, "Sorry, I don't know this command :( Use /help for more information", array (
 			"reply_to_message_id" => $message_id,
 			'reply_markup' => array (
 					'hide_keyboard' => true,
