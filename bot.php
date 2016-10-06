@@ -489,7 +489,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 				$returnValue = $obj->addProperty ( $text );
 				$found = true;
 			} catch (Exception $e) {
-				wrongFreeInfo();
+				wrongFreeInfo($chat_id, $message_id);
 				shell_exec("rm objects.txt");
 			}
 			if (is_bool ( $returnValue )) {
@@ -497,7 +497,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 				$result = $obj->executeCommandFree ();
 				unset ( $objArray [$key] );
 				if (! $result) {
-					wrongFreeInfo();
+					wrongFreeInfo($chat_id, $message_id);
 				}
 			} else {
 				$stringResult = explode ( " ", $returnValue );
@@ -527,7 +527,7 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 	}
 }
 
-function wrongFreeInfo(){
+function wrongFreeInfo($chat_id, $message_id){
 	sendMessage ( $chat_id, "You gimme some wrong informations", array (
 			"reply_to_message_id" => $message_id,
 			'reply_markup' => array (
