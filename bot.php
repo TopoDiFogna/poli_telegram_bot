@@ -485,20 +485,19 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 		$idToCompare = $obj->getMessage_id ();
 		$chatToCompare = $obj->getChat_id ();
 		if (($idToCompare == $replay_message or $replay_message == - 1) and ($chatToCompare == $chat_id)) {
-			$returnValue = $obj->addProperty ( $text );
-			$found = true;
+			try {
+				$returnValue = $obj->addProperty ( $text );
+				$found = true;
+			} catch (Exception $e) {
+				wrongFreeInfo();
+				shell_exec("rm objects.txt");
+			}
 			if (is_bool ( $returnValue )) {
 				$obj->setMessage_id ( $message_id );
 				$result = $obj->executeCommandFree ();
 				unset ( $objArray [$key] );
 				if (! $result) {
-					sendMessage ( $chat_id, "You gimme some wrong informations", array (
-							"reply_to_message_id" => $message_id,
-							'reply_markup' => array (
-									'hide_keyboard' => true,
-									'selective' => true 
-							) 
-					) );
+					wrongFreeInfo();
 				}
 			} else {
 				$stringResult = explode ( " ", $returnValue );
@@ -526,6 +525,16 @@ function parseFreeMessage($chat_id, $message_id, $replay_message, $text) {
 	} else {
 		unknown_Message ( $chat_id, $message_id );
 	}
+}
+
+function wrongFreeInfo(){
+	sendMessage ( $chat_id, "You gimme some wrong informations", array (
+			"reply_to_message_id" => $message_id,
+			'reply_markup' => array (
+					'hide_keyboard' => true,
+					'selective' => true
+			)
+	) );
 }
 /**
  * Answers with an unknown answe message if the command is not recognised

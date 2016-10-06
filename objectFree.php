@@ -48,18 +48,30 @@ class freeObj {
 							return true;
 						}
 					} else {
+						if (!is_numeric($newProperty)) {
+							throw new Exception('Wrong Value');
+						}
 						$this->endTimeM = $newProperty;
 						return "Selected day";
 					}
 				} else {
+					if (!is_numeric($newProperty)) {
+						throw new Exception('Wrong Value');
+					}
 					$this->endTimeH = $newProperty;
 					return "EndTime minutes";
 				}
 			} else {
+				if (!is_numeric($newProperty)) {
+					throw new Exception('Wrong Value');
+				}
 				$this->startTimeM = $newProperty;
 				return "EndTime hours";
 			}
 		} else {
+			if (!is_numeric($newProperty)) {
+				throw new Exception('Wrong Value');
+			}
 			$this->startTimeH = $newProperty;
 			return "StartTime minutes";
 		}
