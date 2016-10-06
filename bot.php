@@ -38,14 +38,6 @@ function processMessage($message) {
 	}
 }
 /**
- * Processes the received query
- *
- * @param $inline_query the
- *        	received query
- */
-function process_Inline_Query($inline_query) {
-}
-/**
  * Parses the incoming text message and perform the approrpiate action
  *
  * @param String $text
@@ -140,23 +132,23 @@ function occupationOfTheDay($chat_id, $time) {
 	$date = strtotime ( $time );
 	$filePath = "files/occupation" . $date . ".html";
 	$result = true;
-	if (! file_exists ( $filePath )) {
-		$result = createOccupationFile ( $date, $filePath );
+	if (! file_exists ( $filePath ) && (time () - filemtime ( $filePath ) > 3600 * 2)) {
+		try {
+			createOccupationFile ( $date, $filePath );
+		} catch ( Exception $e ) {
+			sendMessage ( $chat_id, "I've encountered a error in the Polimi Server. It's not my fault ;)", array () );
+			error_log ( "Error creating file in function occupationOfTheDay" );
+			$result = false;
+			return;
+		}
 	}
-	if (time () - filemtime ( $filePath ) > 3600 * 2) {
-		$result = createOccupationFile ( $date, $filePath );
-	}
-	if ($result) {
-		$result = sendFile ( $chat_id, $filePath, array (
-				"caption" => "Occupation of " . date ( "l d-F", $date ) 
-		) );
-	} else {
-		sendMessage ( $chat_id, "I've encountered a error in the Polimi Server. It's not my fault ;)", array () );
-		error_log ( "Error creating file in function occupationOfTheDay" );
-	}
+	$result = sendFile ( $chat_id, $filePath, array (
+			"caption" => "Occupation of " . date ( "l d-F", $date ) 
+	) );
 	if ($result === false) {
 		sendMessage ( $chat_id, "I've encountered some troubles in sending you the HTML file, I'm Sorry !!", array () );
 		error_log ( "Error while sending the file" . $filePath );
+		return;
 	}
 }
 /**
@@ -182,7 +174,8 @@ function createOccupationFile($date, $file_path) {
 	$result = cUrlRequest ( $url, $options );
 	if ($result == false) {
 		error_log ( "Error calling cUrlRequest from createOccupationFile function" );
-		return false;
+		throw new Exception ( "Error calling cUrlRequest from createOccupationFile function" );
+		return;
 	}
 	
 	$domOfHTML = getDOMFromHTMLIdWithCSS ( $result, 'tableContainer', "spazi/table-MOZ.css" );
@@ -233,7 +226,7 @@ function classOccupation($chat_id, $className, $date) {
 	$date = fixDayString ( $date );
 	$time = strtotime ( $date );
 	$className = str_replace ( ".", "", $className );
-	$className = strtoupper($className);
+	$className = strtoupper ( $className );
 	$classId = idOfGivenClassroom ( $className );
 	if ($classId != - 1) {
 		$cookieUrl = "https://www7.ceda.polimi.it/spazi/spazi/controller/Aula.do?evn_init=event&idaula=" . $classId . "&jaf_currentWFID=main";

@@ -7,27 +7,17 @@ include_once 'objectFree.php';
 
 echo "<html><head></head><body><h2>Poli Telegram Bot FrontEnd</h2></body></html>";
 
-//reads the data from the request
-$content = file_get_contents("php://input");
+// reads the data from the request
+$content = file_get_contents ( "php://input" );
 
-//decode the json request
-$result = json_decode($content, true);
+// decode the json request
+$result = json_decode ( $content, true );
 
-//if the request is empty just exit
-if (!count($result)) {
-	exit;
+// if the request is empty just exit
+if (! count ( $result )) {
+	exit ();
 }
-else {//otherwise process the message
-	switch ($result){
-		case array_key_exists("message", $result) :
-			processMessage($result["message"]);
-			break;
-		case array_key_exists("edited_message", $result) :
-			processMessage($result["edited_message"]);
-			break;
-		case array_key_exists("inline_query", $result) :
-			process_Inline_Query($result["inline_query"]);
-			break;
-	}
+if (array_key_exists ( "message", $result )) {
+	processMessage ( $result ["message"] );
 }
 ?>
